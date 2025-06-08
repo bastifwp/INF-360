@@ -3,22 +3,23 @@ import React, { createContext, useContext, useState } from "react";
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); // Cambié usuario → user para mantener consistencia
+
+  const [user, setUser] = useState(null);
 
   const login = (correo, contrasena) => {
     if (correo === "usuario@demo.com" && contrasena === "123456") {
-      setUser({ correo, rol: "profesional" });
+      setUser({ correo, id: 1, rol: "profesional" });
       return { success: true };
     }
     if (correo === "cuidador@demo.com" && contrasena === "123456") {
-      setUser({ correo, rol: "cuidador" });
+      setUser({ correo, id: 2, rol: "cuidador" });
       return { success: true };
     }
     return { success: false, message: "Credenciales inválidas" };
   };
 
   const logout = () => {
-    setUser(null);  // Aquí corregí setUser (no setUsuario)
+    setUser(null);
   };
 
   return (
@@ -26,6 +27,7 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
+  
 }
 
 export const useAuth = () => useContext(AuthContext);
