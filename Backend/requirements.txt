@@ -1,0 +1,4 @@
+Django==5.2.2
+djangorestframework
+psycopg2-binary
+python-dotenv
