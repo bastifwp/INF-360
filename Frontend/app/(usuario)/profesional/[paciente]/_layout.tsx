@@ -35,6 +35,7 @@ const _layout = () => {
   return (
         <>
             <StatusBar hidden={false} className="bg-primary"/>
+
             <Tabs
                 screenOptions={{
                     tabBarStyle:{
@@ -55,7 +56,7 @@ const _layout = () => {
                 }}
                 >
                 <Tabs.Screen
-                    name="InicioP"
+                    name="index"
                     options={{
                         headerShown: false,
                         tabBarIcon: ({ focused }) => (
@@ -67,7 +68,7 @@ const _layout = () => {
                     }}
                 />
                 <Tabs.Screen
-                    name="PlanP"
+                    name="Plan"
                     options={{
                         headerShown: false,
                         tabBarIcon: ({ focused }) => (
@@ -79,7 +80,7 @@ const _layout = () => {
                     }}
                 />
                 <Tabs.Screen
-                    name="BitacoraP"
+                    name="Bitacora"
                     options={{
                         headerShown: false,
                         tabBarIcon: ({ focused }) => (
@@ -91,7 +92,7 @@ const _layout = () => {
                     }}
                 />
                 <Tabs.Screen
-                    name="ChatP"
+                    name="Chat"
                     options={{
                         headerShown: false,
                         tabBarIcon: ({ focused }) => (

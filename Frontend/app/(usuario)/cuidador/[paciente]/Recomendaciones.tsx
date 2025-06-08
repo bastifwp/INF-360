@@ -1,12 +1,12 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 
-const BitacoraP = () => {
+const Recomendaciones = () => {
   return (
     <View>
-      <Text>BitacoraP</Text>
+      <Text>Recomendaciones</Text>
     </View>
   )
 }
 
-export default BitacoraP
+export default Recomendaciones

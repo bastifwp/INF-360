@@ -1,12 +1,12 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 
-const InicioC = () => {
+const Bitacora = () => {
   return (
     <View>
-      <Text>InicioC</Text>
+      <Text>Bitacora</Text>
     </View>
   )
 }
 
-export default InicioC
+export default Bitacora

@@ -1,12 +1,12 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 
-const ChatP = () => {
+const Plan = () => {
   return (
     <View>
-      <Text>ChatP</Text>
+      <Text>PlanP</Text>
     </View>
   )
 }
 
-export default ChatP
+export default Plan
