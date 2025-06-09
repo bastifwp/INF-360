@@ -4,7 +4,7 @@ import { Text, View } from 'react-native'
 const Recomendaciones = () => {
   return (
     <View>
-      <Text>Recomendaciones</Text>
+      <Text>Chat je</Text>
     </View>
   )
 }

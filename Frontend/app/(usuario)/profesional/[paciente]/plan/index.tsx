@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { View, Text, TouchableOpacity } from 'react-native'
 import { useRouter, useLocalSearchParams } from "expo-router";
 
-import ListaObjetivos from "../../../components/cuidador/ListaObjetivos"
+import ListaObjetivos from "../../../../components/profesional/ListaObjetivos"
 
 const Plan = () => {
 
