@@ -33,7 +33,7 @@ Y listo, la nueva tabla estará en la base de datos PostgreSQL.
 
 ## Agregar nuevos endpoints
 
-1. Ir a `ceapp/views.py` y definir una función o clase para el endpoint para crear la vista
+1. Ir a `ceapp/views.py` y definir una clase para el endpoint para crear la vista
 2. En a `ceapp/urls.py` importar la vista nueva para agregar un path con la ruta y la vista
 
 ### Extra (falta comprobar)

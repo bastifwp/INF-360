@@ -1,9 +1,10 @@
 from django.urls import path
 
 # Importar vista
-from .views import hola_mundo
+from .views import VistaCuidador, VistaProfesional
 
 # Agregar path de nueva vista con su ruta
 urlpatterns = [
-    path('hola/', hola_mundo),
+    path('cuidador/', VistaCuidador.as_view()),
+    path('profesional/', VistaProfesional.as_view()),
 ]
