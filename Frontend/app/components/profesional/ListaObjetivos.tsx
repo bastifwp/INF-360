@@ -104,30 +104,30 @@ const ObjetivoItem = ({ objetivo }) => {
         <>
           <Text style={{ marginTop: 8, color: '#333' }}>{objetivo.descripcion}</Text>
 
-          <View style={{ flexDirection: 'column', marginTop: 12, alignItems: 'flex-end' }}>
+          <View className='mt-3 flex-row justify-between'>
             <TouchableOpacity onPress={handleEditar} style={{ 
               flexDirection: 'row', 
               alignItems: 'center', 
               paddingHorizontal: 12, 
               paddingVertical: 8, 
-              backgroundColor: '#e3f2fd', 
+              backgroundColor: '#d2f7cd', 
               borderRadius: 8,
               marginRight: 16
             }}>
-              <Ionicons name="create-outline" size={20} color="#1e88e5" />
-              <Text style={{ marginLeft: 8, color: '#1e88e5', fontWeight: 'bold' }}>Editar objetivo</Text>
+              <Ionicons name="create-outline" size={20} color="#125c0a" />
+              <Text style={{ marginLeft: 8, color: '#333', fontWeight: 'bold' }}>Editar objetivo</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleEliminar} style={{ 
               flexDirection: 'row', 
               alignItems: 'center', 
               paddingHorizontal: 12, 
               paddingVertical: 8, 
-              backgroundColor: '#e3f2fd', 
+              backgroundColor: '#ffe6e6', 
               borderRadius: 8,
               marginRight: 16
             }}>
               <Ionicons name="trash-outline" size={20} color="#e53935" />
-              <Text style={{ marginLeft: 8, color: '#1e88e5', fontWeight: 'bold' }}>Eliminar objetivo</Text>
+              <Text style={{ marginLeft: 8, color: '#333', fontWeight: 'bold' }}>Eliminar objetivo</Text>
             </TouchableOpacity>
           </View>
         </>

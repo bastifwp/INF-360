@@ -43,6 +43,8 @@ export default function Registro() {
     }
   };
 
+  
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}

@@ -9,7 +9,7 @@ export default function LayoutPaciente() {
 
   return (
     <View className="flex-1 bg-white">
-      <View className="bg-blue-800 px-4 py-3">
+      <View className="bg-secondary px-4 py-3">
         <Text className="text-white font-bold text-base">
           Paciente: {paciente ?? "Sin paciente seleccionado"}
         </Text>

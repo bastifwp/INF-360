@@ -27,6 +27,7 @@ const FooterItem = ({ icon, label, isActive, onPress }: any) => (
       style={{
         color: isActive ? "#FFFFFF" : "#bdbbb3",
         marginTop: 9,
+        marginBottom: 9,
         fontSize: 12,
       }}
     >
@@ -52,7 +53,7 @@ export default function CustomFooter() {
       style={{
         flexDirection: "row",
         backgroundColor: "#114F80",
-        borderRadius: 50,
+        borderRadius: 12,
         marginHorizontal: 10,
         marginBottom: 10,
         height: 70,

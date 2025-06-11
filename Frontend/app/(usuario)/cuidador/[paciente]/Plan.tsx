@@ -51,14 +51,13 @@ const Plan = () => {
 
       {pestanaActiva === 'objetivos' && (
         <>
-          <ListaObjetivos />
           <TouchableOpacity
             onPress={handleAgregar}
             className="absolute bottom-6 right-6 bg-blue-600 rounded-full w-14 h-14 items-center justify-center shadow-lg"
           >
             <Text className="text-white text-xl">＋</Text>
           </TouchableOpacity>
-                  </>
+        </>
                 )}
 
     </View>

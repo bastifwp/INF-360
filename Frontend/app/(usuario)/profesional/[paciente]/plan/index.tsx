@@ -28,7 +28,7 @@ const Plan = () => {
             key={pestana}
             onPress={() => setPestanaActiva(pestana as any)}
             className={`flex-1 py-3 mx-1 rounded-lg ${
-              pestanaActiva === pestana ? 'bg-blue-800' : 'bg-gray-300'
+              pestanaActiva === pestana ? 'bg-primary' : 'bg-gray-300'
             }`}
           >
             <Text
@@ -54,7 +54,7 @@ const Plan = () => {
           <ListaObjetivos />
           <TouchableOpacity
             onPress={handleAgregar}
-            className="absolute bottom-6 right-6 bg-blue-600 rounded-full w-14 h-14 items-center justify-center shadow-lg"
+            className="absolute bottom-6 right-6 bg-secondary rounded-full w-14 h-14 items-center justify-center shadow-lg"
           >
             <Text className="text-white text-xl">＋</Text>
           </TouchableOpacity>

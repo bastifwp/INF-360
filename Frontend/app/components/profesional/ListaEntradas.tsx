@@ -1,5 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, FlatList } from 'react-native';
+import React, { useRef, useState } from 'react';
+import {
+  FlatList,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+  findNodeHandle,
+  UIManager
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const iconExample = 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png';
@@ -7,11 +16,34 @@ const iconExample = 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png';
 const entradas = [
   {
     id: '1',
+    nombre: 'Sesión de Terapia Ocupacional',
+    autor: 'Dr. Smith',
+    fecha: '2025-05-01',
+    descripcion: 'Hoy Juanito Perez estaba muy cansado y no quiso realizar todas las actividades',
+    icono: iconExample,
+    selectedObj: {"1": true, "2": true}
+  },
+  {
+    id: '2',
+    nombre: 'Sesión de Fonoaudiología',
+    autor: 'Dra. López',
+    fecha: '2025-04-15',
+    descripcion: 'Hoy Juanito Perez estaba de buen animo y trabajó de buena manera',
+    icono: iconExample,
+    selectedObj: {"1": true}
+  },
+  // ... más entradas
+];
+
+const objetivos = [
+  {
+    id: '1',
     nombre: 'Mejorar comunicación',
     autor: 'Dr. Smith',
     fecha: '2025-05-01',
     descripcion: 'Incrementar la interacción social y el lenguaje funcional en el niño.',
     icono: iconExample,
+    color: "#2e7512"
   },
   {
     id: '2',
@@ -20,12 +52,38 @@ const entradas = [
     fecha: '2025-04-15',
     descripcion: 'Implementar técnicas de relajación para disminuir episodios ansiosos.',
     icono: iconExample,
+    color:"#d69e02"
   },
-  // ... más entradas
-];
+  {
+    id: '3',
+    nombre: 'Reducir ansiedad',
+    autor: 'Dra. López',
+    fecha: '2025-04-15',
+    descripcion: 'Implementar técnicas de relajación para disminuir episodios ansiosos.',
+    icono: iconExample,
+  },
+  {
+    id: '4',
+    nombre: 'Reducir ansiedad',
+    autor: 'Dra. López',
+    fecha: '2025-04-15',
+    descripcion: 'Implementar técnicas de relajación para disminuir episodios ansiosos.',
+    icono: iconExample,
+  },
+  {
+    id: '5',
+    nombre: 'Reducir ansiedad',
+    autor: 'Dra. López',
+    fecha: '2025-04-15',
+    descripcion: 'Implementar técnicas de relajación para disminuir episodios ansiosos.',
+    icono: iconExample,
+  },
+]
 
 const EntradaItem = ({ entrada }) => {
   const [expandido, setExpandido] = useState(false);
+
+  
 
   return (
     <TouchableOpacity
@@ -44,8 +102,8 @@ const EntradaItem = ({ entrada }) => {
         />
         <View style={{ flex: 1 }}>
           <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{entrada.nombre}</Text>
-          <Text style={{ color: '#555' }}>{`Autor: ${entrada.autor}`}</Text>
           <Text style={{ color: '#555' }}>{`Fecha: ${entrada.fecha}`}</Text>
+          <Text style={{ color: '#555' }}>{`Autor: ${entrada.autor}`}</Text>
         </View>
 
         <Ionicons
@@ -56,7 +114,22 @@ const EntradaItem = ({ entrada }) => {
       </View>
 
       {expandido && (
-        <Text style={{ marginTop: 8, color: '#333' }}>{entrada.descripcion}</Text>
+        <>
+          <View className='p-2 bg-white my-2 rounded-lg'>
+            <Text className='m-2'>{entrada.descripcion}</Text>
+          </View>
+          <Text className='m-2 font-bold'>Objetivos Trabajados</Text>
+          <View className='flex-col'>
+            {objetivos.filter(item => entrada.selectedObj[item.id]).map((item) => (
+              <View key={item.id} 
+                    className="flex-1 items-center justify-between py-3 rounded-3xl my-2"
+                    style={{backgroundColor: item.color}}>
+                <Text className='color-white font-bold'>{item.nombre}</Text>
+              </View>
+            ))}
+          </View>
+        </>
+        
       )}
     </TouchableOpacity>
   );

@@ -27,6 +27,7 @@ const FooterItem = ({ icon, label, isActive, onPress }: any) => (
       style={{
         color: isActive ? "#FFFFFF" : "#bdbbb3",
         marginTop: 9,
+        marginBottom: 9,
         fontSize: 12,
       }}
     >
