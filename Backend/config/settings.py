@@ -27,8 +27,11 @@ SECRET_KEY = 'django-insecure-%+(l%#b+)3=)g%y()2%xd_#3d=69cd+z5+zz^6d2^tn$*c-66=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# Last its your own ip so phones can make requests to it 
-# TO ALLOW MOBILE ACCES: ALLOWED_HOSTS = ['localhost', '127.0.0.1', '<your_computer_ip>']
+
+#TO ALLOW MOBILE ACCES: 
+#ALLOWED_HOSTS = ['localhost', '127.0.0.1', '<your_computer_ip>']
+
+#To only web acces:
 ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'ceapp.CustomUser'
