@@ -27,6 +27,8 @@ SECRET_KEY = 'django-insecure-%+(l%#b+)3=)g%y()2%xd_#3d=69cd+z5+zz^6d2^tn$*c-66=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Last its your own ip so phones can make requests to it 
+# TO ALLOW MOBILE ACCES: ALLOWED_HOSTS = ['localhost', '127.0.0.1', '<your_computer_ip>']
 ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'ceapp.CustomUser'
@@ -43,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'ceapp',
+    'corsheaders',
 ]
 
 REST_FRAMEWORK = {
@@ -67,6 +70,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -144,3 +149,16 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#For comunication with others (no funciona desde celulares):
+'''
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8081",
+    "http://localhost:8000",
+]
+'''
+
+#ONLY FOR LOCAL DEVELOPMENT
+CORS_ALLOW_ALL_ORIGINS = True
+
+
