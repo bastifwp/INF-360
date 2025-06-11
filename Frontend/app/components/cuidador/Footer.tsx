@@ -1,9 +1,7 @@
-// components/CustomFooter.tsx
 import React from "react";
-import { View, TouchableOpacity, Image, Text } from "react-native";
-import { useRouter, usePathname } from "expo-router";
 import { icons } from "@/constants/icons";
-import { useLocalSearchParams } from "expo-router";
+import { View, TouchableOpacity, Image, Text } from "react-native";
+import { useRouter, usePathname, useLocalSearchParams } from "expo-router";
 
 const FooterItem = ({ icon, label, isActive, onPress }: any) => (
   <TouchableOpacity
@@ -37,6 +35,7 @@ const FooterItem = ({ icon, label, isActive, onPress }: any) => (
 );
 
 export default function CustomFooter() {
+
   const router = useRouter();
   const pathname = usePathname();
   const { paciente } = useLocalSearchParams();
@@ -44,7 +43,7 @@ export default function CustomFooter() {
   const items = [
     { route: `/cuidador/${paciente}`, icon: icons.inicio, label: "Inicio" },
     { route: `/cuidador/${paciente}/plan`, icon: icons.plan, label: "Plan" },
-    { route: `/cuidador/${paciente}/recomendaciones`, icon: icons.bitacora, label: "Recomendaciones" },
+    { route: `/cuidador/${paciente}/recomendaciones`, icon: icons.bitacora, label: "Recomendaciones"},
   ];
 
   return (
@@ -52,7 +51,7 @@ export default function CustomFooter() {
       style={{
         flexDirection: "row",
         backgroundColor: "#114F80",
-        borderRadius: 50,
+        borderRadius: 12,
         marginHorizontal: 10,
         marginBottom: 10,
         height: 70,
@@ -73,4 +72,5 @@ export default function CustomFooter() {
       ))}
     </View>
   );
+  
 }

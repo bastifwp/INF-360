@@ -4,11 +4,9 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 
 import ListaEntradas from "../../../../components/profesional/ListaEntradas"
 
-
-
 const Bitacora = () => {
   const router = useRouter();
-  const { paciente } = useLocalSearchParams(); // o mejor usa useParams si paciente es path param
+  const { paciente } = useLocalSearchParams();
 
   const handleAgregar = () => {
     console.log('Agregar entrada pulsado')
@@ -17,8 +15,8 @@ const Bitacora = () => {
   }
 
   return (
-    <View className="flex-1 p-4">
-      <Text className="text-2xl font-bold mb-4">Bitácora</Text>
+    <View className="flex-1">
+      <Text className="text-3xl font-bold my-2 align-middle self-center color-primary">Bitácora</Text>
 
       {/* Solo la lista */}
       <View className="flex-1">

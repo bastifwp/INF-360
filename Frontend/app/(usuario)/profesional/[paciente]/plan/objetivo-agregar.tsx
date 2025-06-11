@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native'
-import { useRouter, useLocalSearchParams } from "expo-router";
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+
+import CategoriaDropdown from '../../../../components/profesional/DropdownObjetivos';
 
 const ObjetivoAgregar = () => {
   const router = useRouter();
@@ -10,23 +12,21 @@ const ObjetivoAgregar = () => {
   const [autor, setAutor] = useState('');
   const [fecha, setFecha] = useState('');
   const [descripcion, setDescripcion] = useState('');
+  const [categoria, setCategoria] = useState(null);
 
   const handleGuardar = () => {
-    if (!nombre || !autor || !fecha || !descripcion) {
+    if (!nombre || !autor || !fecha || !descripcion || !categoria) {
       Alert.alert('Error', 'Por favor completa todos los campos');
       return;
     }
-
-    // Aquí podrías llamar a una API o hacer la lógica para guardar el objetivo
-    console.log('Nuevo objetivo:', { nombre, autor, fecha, descripcion, paciente });
-
-    // Después de guardar, regresa a la bitácora
+    console.log('Nuevo objetivo:', { nombre, autor, fecha, descripcion, categoria, paciente });
     router.push(`/profesional/${paciente}/bitacora`);
   };
 
   return (
-    <View className="flex-1 p-4 bg-white">
-      <Text className="text-3xl font-bold my-4  align-middle self-center color-primary">Agregar Objetivo</Text>
+    <ScrollView className="flex-1 bg-white">
+
+      <Text className="text-3xl font-bold my-2 align-middle self-center color-primary">Agregar objetivo</Text>
 
       <Text className="font-semibold mb-1">Nombre</Text>
       <TextInput
@@ -52,6 +52,9 @@ const ObjetivoAgregar = () => {
         className="border border-gray-400 rounded-xl px-4 py-3 mb-4"
       />
 
+      <Text className="font-semibold mb-1">Categoría</Text>
+      <CategoriaDropdown selected={categoria} onSelect={setCategoria} />
+
       <Text className="font-semibold mb-1">Descripción</Text>
       <TextInput
         value={descripcion}
@@ -68,8 +71,9 @@ const ObjetivoAgregar = () => {
       >
         <Text className="text-white font-bold text-lg">Guardar</Text>
       </TouchableOpacity>
-    </View>
-  )
-}
+    </ScrollView>
+    
+  );
+};
 
 export default ObjetivoAgregar;

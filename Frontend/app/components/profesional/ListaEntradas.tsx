@@ -118,7 +118,7 @@ const EntradaItem = ({ entrada }) => {
           <View className='p-2 bg-white my-2 rounded-lg'>
             <Text className='m-2'>{entrada.descripcion}</Text>
           </View>
-          <Text className='m-2 font-bold'>Objetivos Trabajados</Text>
+          <Text className='m-2 font-bold'>Objetivos trabajados</Text>
           <View className='flex-col'>
             {objetivos.filter(item => entrada.selectedObj[item.id]).map((item) => (
               <View key={item.id} 

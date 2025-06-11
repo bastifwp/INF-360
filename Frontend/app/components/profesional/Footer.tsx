@@ -1,9 +1,7 @@
-// components/CustomFooter.tsx
 import React from "react";
-import { View, TouchableOpacity, Image, Text } from "react-native";
-import { useRouter, usePathname } from "expo-router";
 import { icons } from "@/constants/icons";
-import { useLocalSearchParams } from "expo-router";
+import { View, TouchableOpacity, Image, Text } from "react-native";
+import { useRouter, usePathname, useLocalSearchParams } from "expo-router";
 
 const FooterItem = ({ icon, label, isActive, onPress }: any) => (
   <TouchableOpacity
@@ -37,6 +35,7 @@ const FooterItem = ({ icon, label, isActive, onPress }: any) => (
 );
 
 export default function CustomFooter() {
+
   const router = useRouter();
   const pathname = usePathname();
   const { paciente } = useLocalSearchParams();
@@ -74,4 +73,5 @@ export default function CustomFooter() {
       ))}
     </View>
   );
+  
 }

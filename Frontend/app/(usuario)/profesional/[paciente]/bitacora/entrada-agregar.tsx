@@ -83,8 +83,8 @@ const EntradaAgregar = () => {
   };
 
   return (
-    <ScrollView className="flex-col py-4 px-6 bg-white">
-      <Text className="text-3xl font-bold my-4  align-middle self-center color-primary">Agregar entrada</Text>
+    <ScrollView className="flex-col bg-white">
+      <Text className="text-3xl font-bold my-2 align-middle self-center color-primary">Agregar entrada</Text>
 
       <Text className="font-semibold mb-1">Título</Text>
       <TextInput

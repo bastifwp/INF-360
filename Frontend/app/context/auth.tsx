@@ -8,11 +8,11 @@ export function AuthProvider({ children }) {
 
   const login = (correo, contrasena) => {
     if (correo === "usuario@demo.com" && contrasena === "123456") {
-      setUser({ correo, id: 1, rol: "profesional" });
+      setUser({ correo, id: 1, nombre: "Juanita Pérez", rol: "profesional" });
       return { success: true };
     }
     if (correo === "cuidador@demo.com" && contrasena === "123456") {
-      setUser({ correo, id: 2, rol: "cuidador" });
+      setUser({ correo, id: 2, nombre: "Juanita Pérez", rol: "cuidador" });
       return { success: true };
     }
     return { success: false, message: "Credenciales inválidas" };
