@@ -1,18 +1,23 @@
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
-  View,
-  TextInput,
-  Text,
-  TouchableOpacity,
   Platform,
   ScrollView,
-  Alert,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
+import RadioButton from "../../components/RadioButton";
 import { useAuth } from "../../context/auth"; // Ajusta la ruta según tu estructura
 
-import RadioButton from "../../components/RadioButton";
+
+//Para hacer consultas a apis
+import axios from 'axios';
+
+
 
 export default function Registro() {
   const router = useRouter();
@@ -25,22 +30,71 @@ export default function Registro() {
   const [cargo, setCargo] = useState("");
   const [institucion, setInstitucion] = useState("");
 
-  const handleRegistro = () => {
+  const handleRegistro = async () => {
     if (!rol || !nombre || !correo || !contrasena) {
       Alert.alert("Error", "Por favor, completa todos los campos requeridos.");
       return;
     }
 
-    // Aquí podrías guardar datos en una base real si tuvieras backend
+    /* ------------- Si tienen corriendo la bd - -------------- */
+
+    //Intentamos hacer fetch a la base de datos
+    try {
+      console.log("About to send");
+
+      //Para acceder desde el pc la ruta es es: http://localhost:8000/registro (endpoint de la api de bakcend)
+      //Para acceder desde el celular la ruta es: http://<ipv4 del pc>/registro 
+      //Eso pasa porque el celular no hace la conuslta al localhost (a el mismo) sino que lo hace al pc
+      const response = await axios.post('http://localhost:8000/registro/', {
+        
+        //En el backend hay un "serializer" por cada consulta
+        //El serializer del backend te dice la estructura del json a mandar
+        nombre: nombre, 
+        password: contrasena,
+        email: correo,
+        role: rol,
+        cargo: cargo,
+        institucion: institucion,
+      });
+
+      console.log("Already sent")
+      console.log(response.data);
+
+      Alert.alert('Success', 'You have registered successfully!');
+      setRol('');
+      setNombre('');
+      setContrasena('');
+      setCargo('');
+      setInstitucion('');
+    }
+    //Vemos si es que el try tira error
+    catch(error){
+
+      //Si la consulta tuvo error desde la base de datos (bad request)
+      if(error.response){
+        console.log(error.response.data);
+        Alert.alert(error.response.data);
+        Alert.alert('Error', error.response.data.message || 'Registration failed.'); //Esto no siempre funciona
+      }  
+
+      //Si la consulta fue rechazada o no llegó a la base de datos
+      else {
+        console.log(error);
+        Alert.alert('Error', 'Network error. Please try again.');
+      }
+    };
+    
+
+
+    /*  Si no tienen corriendo la bd comentar lo de arriba y dejar lo q estaba: 
 
     const result = login(correo, contrasena); // 👈 login automático tras registro
-
     if (result.success) {
       Alert.alert("Registro exitoso", `Bienvenido, ${nombre}`);
       router.replace("/"); // 👈 redirige al index, que enviará según el rol
     } else {
       Alert.alert("Error", result.message);
-    }
+    }*/
   };
 
   
