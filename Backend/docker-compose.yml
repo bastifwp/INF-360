@@ -1,0 +1,24 @@
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: ceapp
+      POSTGRES_USER: ceapp_user
+      POSTGRES_PASSWORD: ceapp_pass
+
+volumes:
+  postgres_data:
