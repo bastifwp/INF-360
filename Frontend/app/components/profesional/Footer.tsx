@@ -67,7 +67,11 @@ export default function CustomFooter() {
           key={item.route}
           icon={item.icon}
           label={item.label}
-          isActive={pathname.startsWith(item.route)}
+          isActive={
+            item.label === "Inicio"
+            ? pathname === item.route
+            : pathname === item.route || pathname.startsWith(item.route + '/')
+          }
           onPress={() => router.push(item.route)}
         />
       ))}

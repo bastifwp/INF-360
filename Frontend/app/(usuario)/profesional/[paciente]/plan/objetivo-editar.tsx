@@ -70,7 +70,7 @@ const ObjetivoEditar = () => {
     <ScrollView className="flex-1 bg-white">
       <Text className="text-3xl font-bold my-2 align-middle self-center color-primary">Agregar objetivo</Text>
 
-      <Text className="font-semibold mb-1">titulo</Text>
+      <Text className="font-semibold mb-1">Nombre</Text>
       <TextInput
         value={titulo}
         onChangeText={settitulo}
