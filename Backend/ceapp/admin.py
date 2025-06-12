@@ -13,9 +13,13 @@ class CustomUserAdmin(UserAdmin):
         (None, {'fields': ('role', 'cargo', 'institucion')}),
     )
 
+class ObjetivoAdmin(admin.ModelAdmin):
+    list_display = ('titulo', 'autor_creacion', 'fecha_creacion', 'autor_modificacion', 'fecha_modificacion')
+    readonly_fields = ('fecha_creacion', 'fecha_modificacion')
+
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(PlanTrabajo)
 admin.site.register(ProfesionalPlanTrabajo)
-admin.site.register(Objetivo)
+admin.site.register(Objetivo, ObjetivoAdmin)
 admin.site.register(BitacoraEntrada)
 admin.site.register(BitacoraEntradaObjetivo)

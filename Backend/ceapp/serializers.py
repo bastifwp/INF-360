@@ -33,6 +33,7 @@ class ObjetivoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Objetivo
         fields = '__all__'
+        read_only_fields = ['autor_creacion', 'fecha_creacion', 'autor_modificacion', 'fecha_modificacion']
 
 class BitacoraEntradaSerializer(serializers.ModelSerializer):
     class Meta:

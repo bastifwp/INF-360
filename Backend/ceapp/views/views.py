@@ -81,7 +81,7 @@ class ObjetivoView(APIView):
             return Response({'detail': 'No autorizado'}, status=status.HTTP_403_FORBIDDEN)
         serializer = ObjetivoSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(autor_creacion=request.user, autor_modificacion=request.user)
+            serializer.save(autor_creacion=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
