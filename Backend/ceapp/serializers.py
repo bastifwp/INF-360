@@ -12,12 +12,39 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['email', 'password', 'nombre', 'role', 'cargo', 'institucion']
 
     def create(self, validated_data):
-        nombre = validated_data.pop('nombre')  # sacamos nombre
+        nombre = validated_data.pop('nombre')
         password = validated_data.pop('password')
 
         user = CustomUser(**validated_data)
         user.first_name = nombre
         user.set_password(password)
-        user.username = validated_data['email']  # opcional: username = email
+        user.username = validated_data['email']
         user.save()
         return user
+    
+# Esqueletos de serializers para pruebas
+    
+class PlanTrabajoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlanTrabajo
+        fields = '__all__'
+
+class ObjetivoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Objetivo
+        fields = '__all__'
+
+class BitacoraEntradaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BitacoraEntrada
+        fields = '__all__'
+
+class ProfesionalPlanTrabajoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfesionalPlanTrabajo
+        fields = '__all__'
+
+class BitacoraEntradaObjetivoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BitacoraEntradaObjetivo
+        fields = '__all__'
