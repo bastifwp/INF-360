@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import { useRouter, useLocalSearchParams, useNavigation } from "expo-router"
 
-import { DescartarCambiosObjetivoContext } from '../../context/DescartarCambiosObjetivo';
+import { DescartarCambiosContext } from '../../context/DescartarCambios';
 
 const categorias = ['Comunicación', 'Motricidad', 'Cognición', 'Conducta'];
 const categoriaColores = {
@@ -14,48 +14,66 @@ const categoriaColores = {
 };
 
 const CategoriaDropdown = ({ selected, onSelect }) => {
-    const [open, setOpen] = useState(false);
-    const handleSelect = (categoria) => {
-        onSelect(categoria);
-        setOpen(false);
-    };
-    return (
-        <View className="my-2 mb-4">
-            {/* Botón principal */}
-            <TouchableOpacity
-                className="border border-gray-400 rounded-xl px-4 py-3"
-                style={{
-                    borderColor: selected ? categoriaColores[selected] || categoriaColores.default : '#ccc',
-                }}
-                onPress={() => setOpen(!open)}
-            >
-                <Text className={`text-base ${selected ? 'text-gray-900' : 'text-gray-500'}`}>
-                    {selected || 'Selecciona una categoría'}
-                </Text>
-            </TouchableOpacity>
-            {/* Lista desplegable */}
-            {open && (
-                <View className="bg-white rounded-xl border border-gray-300 shadow-lg">
-                    {categorias.map((item) => {
-                        const color = categoriaColores[item] || categoriaColores.default;
-                        return (
-                            <TouchableOpacity
-                                key={item}
-                                className="px-4 py-3 border-b border-gray-200"
-                                style={{
-                                borderLeftWidth: 5,
-                                borderLeftColor: color,
-                                }}
-                                onPress={() => handleSelect(item)}
-                            >
-                                <Text className="text-base text-gray-900">{item}</Text>
-                            </TouchableOpacity>
-                        );
-                    })}
-                </View>
-            )}
+  const [open, setOpen] = useState(false);
+  const handleSelect = (categoria) => {
+    onSelect(categoria);
+    setOpen(false);
+  };
+
+  return (
+    <View className="my-2 mb-4">
+      {/* Botón principal */}
+      <TouchableOpacity
+        className="border border-gray-400 rounded-xl px-4 py-3 flex-row items-center"
+        style={{
+          borderColor: selected ? categoriaColores[selected] || categoriaColores.default : '#ccc',
+        }}
+        onPress={() => setOpen(!open)}
+      >
+        {selected && (
+          <View
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: 6,
+              backgroundColor: categoriaColores[selected] || categoriaColores.default,
+              marginRight: 10,
+            }}
+          />
+        )}
+        <Text className={`text-base ${selected ? 'text-gray-900' : 'text-gray-500'}`}>
+          {selected || 'Selecciona una categoría'}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Lista desplegable */}
+      {open && (
+        <View className="bg-white rounded-xl border border-gray-300 shadow-lg">
+          {categorias.map((item) => {
+            const color = categoriaColores[item] || categoriaColores.default;
+            return (
+              <TouchableOpacity
+                key={item}
+                className="px-4 py-3 border-b border-gray-200 flex-row items-center"
+                onPress={() => handleSelect(item)}
+              >
+                <View
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 6,
+                    backgroundColor: color,
+                    marginRight: 10,
+                  }}
+                />
+                <Text className="text-base text-gray-900">{item}</Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
-    );
+      )}
+    </View>
+  );
 };
 
 const FormularioObjetivo = () => {
@@ -148,7 +166,7 @@ const FormularioObjetivo = () => {
     }, [navigation, titulo, descripcion, categoria]);
 
     //DESCARTAR CAMBIOS
-    const handleDescartarCambiosObjetivo = (path) => {
+    const handleDescartarCambios = (path) => {
         if (hayCambios()) {
             Alert.alert(
                 '¿Descartar cambios?',
@@ -185,7 +203,18 @@ const FormularioObjetivo = () => {
             //EL AUTOR DEBE SER EL ID DEL USUARIO (OBTENER POR USEAUTH())
             //LA FECHA SE DEBERÍA CREAR AUTOMÁTICAMENTE EN EL BACKEND
         }
-        router.push(`/profesional/${paciente}/plan`)
+        Alert.alert(
+            'Éxito',
+            'Objetivo  guardado correctamente',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  router.push(`/profesional/${paciente}/plan`);
+                },
+              },
+        ])
+        //ACÁ DEBERÍAMOS PONER UN CASO EN EL QUE NO SE GUARDA EXITOSAMENTE
     }
 
     if (loading) {
@@ -198,7 +227,7 @@ const FormularioObjetivo = () => {
     
     return (
         
-        <DescartarCambiosObjetivoContext.Provider value={{ handleDescartarCambiosObjetivo }}>
+        <DescartarCambiosContext.Provider value={{ handleDescartarCambios }}>
 
             <ScrollView className="flex-1 bg-white">
 
@@ -240,7 +269,7 @@ const FormularioObjetivo = () => {
         
         </ScrollView>
 
-        </DescartarCambiosObjetivoContext.Provider>
+        </DescartarCambiosContext.Provider>
   
     );
 

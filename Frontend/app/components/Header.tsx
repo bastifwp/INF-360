@@ -2,12 +2,12 @@ import { useRouter, usePathname } from "expo-router";
 import { TouchableOpacity, Image, View, Text, Alert } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { images } from "@/constants/images";
-import { useDescartarCambiosObjetivo } from "../context/DescartarCambiosObjetivo";
+import { useDescartarCambios } from "../context/DescartarCambios";
 
 export default function Header() {
   const router = useRouter();
   const pathname = decodeURIComponent(usePathname());
-  const { handleDescartarCambiosObjetivo } = useDescartarCambiosObjetivo();
+  const { handleDescartarCambios } = useDescartarCambios();
 
   if (!pathname) return null;
   const pathParts = pathname.split("/").filter(Boolean);
@@ -33,8 +33,8 @@ export default function Header() {
   }
 
   const handlePress = () => {
-    if (shouldUseHandleDescartar && handleDescartarCambiosObjetivo) {
-      handleDescartarCambiosObjetivo(backRoute);
+    if (shouldUseHandleDescartar && handleDescartarCambios) {
+      handleDescartarCambios(backRoute);
     } else if (shouldShowAlert) {
       Alert.alert(
         "¿Cerrar sesión?",

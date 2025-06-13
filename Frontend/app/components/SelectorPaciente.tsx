@@ -1,4 +1,4 @@
-import { Text, View, Image, TouchableOpacity,  ScrollView } from 'react-native';
+import { Text, View, TouchableOpacity,  ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
@@ -7,8 +7,6 @@ const pacientes = [
   { id: "2", nombre: "Juan Pérez", cuidador: "Alice López"},
   { id: "3", nombre: "María López", cuidador: "Bob López"},
 ];
-
-const avatarPlaceholder = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
 const PacienteItem = ({ paciente, rol }: { paciente: any, rol: string }) => {
   return (
@@ -26,10 +24,6 @@ const PacienteItem = ({ paciente, rol }: { paciente: any, rol: string }) => {
           alignItems: 'center',
         }}
       >
-        <Image
-          source={{ uri: paciente.avatar || avatarPlaceholder }}
-          style={{ width: 48, height: 48, borderRadius: 24, marginRight: 12 }}
-        />
         <View style={{ flex: 1 }}>
           <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{paciente.nombre}</Text>
           {rol !== "cuidador" && (
