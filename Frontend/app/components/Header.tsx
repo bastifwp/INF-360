@@ -1,37 +1,41 @@
 import { useRouter, usePathname } from "expo-router";
 import { TouchableOpacity, Image, View, Text, Alert } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
+import { useDescartarCambiosObjetivo } from "../context/DescartarCambiosObjetivo";
 
 export default function Header() {
   const router = useRouter();
   const pathname = decodeURIComponent(usePathname());
+  const { handleDescartarCambiosObjetivo } = useDescartarCambiosObjetivo();
 
   if (!pathname) return null;
-
-  const pathParts = pathname.split("/").filter(Boolean); // ["cuidador", "1-Juanita Pérez", "bitacora"]
+  const pathParts = pathname.split("/").filter(Boolean);
   const userType = pathParts[0];
   const paciente = pathParts[1];
 
   let backRoute = null;
-  let iconName = "arrow-back"; // por defecto
+  let iconName = "arrow-back";
   let shouldShowAlert = false;
+  let shouldUseHandleDescartar = false;
 
   if (pathname.includes("/objetivo")) {
     backRoute = `/${userType}/${paciente}/plan`;
+    shouldUseHandleDescartar = true;
   } else if (pathname.includes("/entrada")) {
     backRoute = `/${userType}/${paciente}/bitacora`;
   } else if (pathParts.length === 2) {
     backRoute = `/${userType}`;
   } else if (pathParts.length === 1) {
     backRoute = `/login`;
-    iconName = "log-out-outline"; // ícono distinto para salir
+    iconName = "log-out-outline";
     shouldShowAlert = true;
   }
 
   const handlePress = () => {
-    if (shouldShowAlert) {
+    if (shouldUseHandleDescartar && handleDescartarCambiosObjetivo) {
+      handleDescartarCambiosObjetivo(backRoute);
+    } else if (shouldShowAlert) {
       Alert.alert(
         "¿Cerrar sesión?",
         "¿Estás segur@ de que deseas salir?",

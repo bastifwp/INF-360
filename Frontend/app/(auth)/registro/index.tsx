@@ -38,6 +38,7 @@ export default function Registro() {
 
     /* ------------- Si tienen corriendo la bd - -------------- */
 
+    /*
     //Intentamos hacer fetch a la base de datos
     try {
       console.log("About to send");
@@ -84,9 +85,7 @@ export default function Registro() {
       }
     };
     
-
-
-    /*  Si no tienen corriendo la bd comentar lo de arriba y dejar lo q estaba: 
+    */
 
     const result = login(correo, contrasena); // 👈 login automático tras registro
     if (result.success) {
@@ -94,7 +93,7 @@ export default function Registro() {
       router.replace("/"); // 👈 redirige al index, que enviará según el rol
     } else {
       Alert.alert("Error", result.message);
-    }*/
+    }
   };
 
   

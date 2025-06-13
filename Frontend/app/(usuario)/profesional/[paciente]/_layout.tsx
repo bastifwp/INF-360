@@ -25,6 +25,7 @@ export default function LayoutPaciente() {
         <Text className="text-white font-bold text-base">
           Paciente: {nombre}
         </Text>
+        {/*
         <TouchableOpacity
           onPress={navegarSelectorPaciente}
           className="bg-secondary rounded-full p-1 border border-white"
@@ -32,6 +33,7 @@ export default function LayoutPaciente() {
         >
           <FontAwesome name="users" size={20} color="white" />
         </TouchableOpacity>
+        */}
       </View>
 
       <View className="flex-1 p-4 pb-24">
