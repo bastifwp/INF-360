@@ -32,7 +32,7 @@ DEBUG = True
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1', '<your_computer_ip>']
 
 #To only web acces:
-ALLOWED_HOSTS = ['localhost','127.0.0.1', '192.168.153.65']
+ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'ceapp.CustomUser'
 
