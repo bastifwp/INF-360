@@ -1,23 +1,47 @@
 import React from "react";
-import { View, Text } from "react-native";
-import { Slot, useLocalSearchParams } from "expo-router";
+import { FontAwesome } from '@expo/vector-icons';
+import { View, Text, TouchableOpacity } from "react-native";
+import { Slot, useLocalSearchParams, useRouter } from "expo-router";
 
 import Footer from "../../../components/cuidador/Footer"
 
 export default function LayoutPaciente() {
+
+  const router = useRouter();
   const { paciente } = useLocalSearchParams();
+  const [id, encodedNombre] = paciente?.split("-") ?? [null, null];
+  const nombre = encodedNombre ? decodeURIComponent(encodedNombre) : null;
+
+  const navegarSelectorPaciente = () => {
+    router.push(`/cuidador`)
+  }
 
   return (
+
     <View className="flex-1 bg-white">
-      <View className="bg-blue-800 px-4 py-3">
+      
+      {/* Barra Paciente */}
+      <View className="bg-secondary flex-row justify-between items-center px-4 py-3">
         <Text className="text-white font-bold text-base">
-          Paciente: {paciente ?? "Sin paciente seleccionado"}
+          Paciente: {nombre}
         </Text>
+        {/*
+        <TouchableOpacity
+          onPress={navegarSelectorPaciente}
+          className="bg-secondary rounded-full p-1 border border-white"
+          activeOpacity={0.7}
+        >
+          <FontAwesome name="users" size={20} color="white" />
+        </TouchableOpacity>
+        */}
       </View>
-      <View className="flex-1 pb-24">
+
+      <View className="flex-1 p-4 pb-24">
         <Slot />
       </View>
-      <Footer/>
+      <Footer />
+
     </View>
+
   );
 };

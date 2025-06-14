@@ -17,7 +17,6 @@ class CustomUser(AbstractUser):
 class PlanTrabajo(models.Model):
     nombre = models.CharField(max_length=255)
     cuidador = models.ForeignKey(User, on_delete=models.CASCADE, related_name='planes_cuidador')
-
     def __str__(self):
         return self.nombre
 
@@ -28,15 +27,16 @@ class ProfesionalPlanTrabajo(models.Model):
 
 
 class Objetivo(models.Model):
+    titulo = models.CharField(max_length=255)
     descripcion = models.TextField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     autor_creacion = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='objetivos_creados')
     fecha_modificacion = models.DateTimeField(auto_now=True)
-    autor_modificacion = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='objetivos_modificados')
+    autor_modificacion = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='objetivos_modificados')
     plan_trabajo = models.ForeignKey(PlanTrabajo, on_delete=models.CASCADE, related_name='objetivos')
 
     def __str__(self):
-        return self.descripcion[:30]
+        return self.titulo
 
 
 class BitacoraEntrada(models.Model):

@@ -19,9 +19,10 @@ import axios from 'axios';
 
 
 
+
 export default function Registro() {
   const router = useRouter();
-  const { login } = useAuth(); // 👈 importar login del contexto
+  const { login } = useAuth(); // 👈 ocupamos la función login del contexto
 
   const [rol, setRol] = useState("");
   const [nombre, setNombre] = useState("");
@@ -33,17 +34,19 @@ export default function Registro() {
   const handleRegistro = async () => {
     if (!rol || !nombre || !correo || !contrasena) {
       Alert.alert("Error", "Por favor, completa todos los campos requeridos.");
+      console.log("Error", "Por favor, completa todos los campos requeridos.");
       return;
     }
 
     /* ------------- Si tienen corriendo la bd - -------------- */
 
+    
     //Intentamos hacer fetch a la base de datos
     try {
       console.log("About to send");
 
       //Para acceder desde el pc la ruta es es: http://localhost:8000/registro (endpoint de la api de bakcend)
-      //Para acceder desde el celular la ruta es: http://<ipv4 del pc>/registro 
+      //Para acceder desde el celular la ruta es: http://<ipv4 del pc>:8000/registro 
       //Eso pasa porque el celular no hace la conuslta al localhost (a el mismo) sino que lo hace al pc
       const response = await axios.post('http://localhost:8000/registro/', {
         
@@ -57,10 +60,37 @@ export default function Registro() {
         institucion: institucion,
       });
 
-      console.log("Already sent")
+      console.log("Successfull register");
       console.log(response.data);
-
+      
       Alert.alert('Success', 'You have registered successfully!');
+
+      //Como el registro fue un éxito entonces ahora intentamos logearnos
+      try{
+        const result = login(correo, contrasena);
+        console.log("Succesfull login");
+        Alert.alert("Succesfull login");
+
+        //Redireccionamos al index
+        router.replace("/");
+      }
+      catch(error: unknown){
+
+        if(axios.isAxiosError(error) && error.response?.status === 400){
+          const errores = error.response.data;
+
+          Alert.alert("Error al iniciar sesión");
+          console.log("Error al iniciar sesión");
+        }else{
+            
+          Alert.alert("Error desconocido al iniciar sesión");
+          console.log("Error desconocido al iniciar sesión");
+
+        }
+      }
+      
+    
+
       setRol('');
       setNombre('');
       setContrasena('');
@@ -68,36 +98,34 @@ export default function Registro() {
       setInstitucion('');
     }
     //Vemos si es que el try tira error
-    catch(error){
+    catch(error: unknown){
 
-      //Si la consulta tuvo error desde la base de datos (bad request)
-      if(error.response){
-        console.log(error.response.data);
-        Alert.alert(error.response.data);
-        Alert.alert('Error', error.response.data.message || 'Registration failed.'); //Esto no siempre funciona
-      }  
+      if(axios.isAxiosError(error) && error.response?.status === 400){
+        const errores = error.response.data;
 
-      //Si la consulta fue rechazada o no llegó a la base de datos
-      else {
-        console.log(error);
-        Alert.alert('Error', 'Network error. Please try again.');
+        Alert.alert("Error al registrarse");
+        console.log("Error al registrarse");
+      }
+
+      //EL error no es de axios
+      else{
+        Alert.alert("Error desconocido al intentar registrarse");
+        console.log("Error desconocido al intentar registrarse");
       }
     };
     
-
-
-    /*  Si no tienen corriendo la bd comentar lo de arriba y dejar lo q estaba: 
-
+    
+    /*
     const result = login(correo, contrasena); // 👈 login automático tras registro
     if (result.success) {
       Alert.alert("Registro exitoso", `Bienvenido, ${nombre}`);
       router.replace("/"); // 👈 redirige al index, que enviará según el rol
     } else {
       Alert.alert("Error", result.message);
-    }*/
+    }
+    */
   };
 
-  
 
   return (
     <KeyboardAvoidingView

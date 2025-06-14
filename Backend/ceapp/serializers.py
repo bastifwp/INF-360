@@ -1,6 +1,23 @@
 from rest_framework import serializers
 from .models import CustomUser, PlanTrabajo, ProfesionalPlanTrabajo, Objetivo, BitacoraEntrada, BitacoraEntradaObjetivo
 
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
+#Extendemos la clase de serializer para que retorne más cosas que nececita el frontend
+class  CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        #Agregamos campos a la response
+        data['role'] = self.user.role.lower()
+        data['nombre'] = self.user.first_name
+
+        return data
+
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     # campos adicionales personalizados
     email = serializers.EmailField(required=True)
@@ -11,13 +28,64 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['email', 'password', 'nombre', 'role', 'cargo', 'institucion']
 
-    def create(self, validated_data):
-        nombre = validated_data.pop('nombre')  # sacamos nombre
-        password = validated_data.pop('password')
+    #Funciones de validación que se llaman automáticamente cuando se ocupe .is_valid en las views
+    def validate_email(self, value):
 
+        #Buscamos el correo en la base de datos
+        print(CustomUser.objects.all())
+        if CustomUser.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Este correo ya está registrado.")
+        
+        #Si todo está bien entonces el dato es válido
+        return value
+
+
+    def create(self, validated_data):
+
+        #Obtenemos los datos del json
+        email = validated_data.pop('email')
+        password = validated_data.pop('password')
+        nombre = validated_data.pop('nombre')
+        role = validated_data.pop('role')
+        cargo = validated_data.pop('cargo', None)             #None porque puede ser vacío
+        institucion = validated_data.pop('institucion', None) #None porque puede ser vacío
+
+        #Creamos al usuairo
         user = CustomUser(**validated_data)
         user.first_name = nombre
         user.set_password(password)
-        user.username = validated_data['email']  # opcional: username = email
+        user.username = email
+        user.role = role
+        user.cargo = cargo
+        user.institucion = institucion
         user.save()
+
         return user
+    
+# Esqueletos de serializers para pruebas
+    
+class PlanTrabajoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlanTrabajo
+        fields = '__all__'
+
+class ObjetivoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Objetivo
+        fields = '__all__'
+        read_only_fields = ['autor_creacion', 'fecha_creacion', 'autor_modificacion', 'fecha_modificacion']
+
+class BitacoraEntradaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BitacoraEntrada
+        fields = '__all__'
+
+class ProfesionalPlanTrabajoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfesionalPlanTrabajo
+        fields = '__all__'
+
+class BitacoraEntradaObjetivoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BitacoraEntradaObjetivo
+        fields = '__all__'

@@ -1,25 +1,40 @@
-import React, { useState } from 'react'
-import { View, Text, TouchableOpacity } from 'react-native'
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useState } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 
-import ListaObjetivos from "../../../components/cuidador/ListaObjetivos"
+import ListaObjetivos from "../../../components/cuidador/ListaObjetivos";
+
+const objetivos = [
+  {
+    id: '1',
+    titulo: 'Mejorar comunicación',
+    descripcion: 'Incrementar la interacción social y el lenguaje funcional en el niño.',
+    categoria: 'Comunicación',
+    autor_creacion: 'Dr. Smith',
+    fecha_creacion: '2025-05-01',
+    autor_modificacion: 'Dr. Smith',
+    fecha_modificacion: '2025-05-01',
+  }
+]
+
+//También se pueden crear estructuras para que sean listas de estructuras, donde se defina el objetivo asociado
+const metas: string[] = []
+const actividades: string[] = []
 
 const Plan = () => {
 
   const router = useRouter();
-  const { paciente } = useLocalSearchParams(); // Para conservar el ID dinámico
-
+  const { paciente } = useLocalSearchParams();
   const [pestanaActiva, setPestanaActiva] = useState<'objetivos' | 'metas' | 'actividades'>('objetivos')
 
   const handleAgregar = () => {
-    console.log('Agregar objetivo pulsado')
-    console.log("Paciente:", paciente);
+    console.log('[./app/(usuario)/profesional/[paciente]/plan/index.tsx] Agregando objetivo...')
     router.push(`/profesional/${paciente}/plan/objetivo-agregar`);
   }
 
   return (
-    <View className="flex-1 p-4">
-      <Text className="text-2xl font-bold mb-4">Plan de trabajo</Text>
+    <View className="flex-1">
+      <Text className="text-3xl font-bold my-2 align-middle self-center color-primary">Plan de trabajo</Text>
 
       {/* Barra de pestañas */}
       <View className="flex-row mb-4">
@@ -28,7 +43,7 @@ const Plan = () => {
             key={pestana}
             onPress={() => setPestanaActiva(pestana as any)}
             className={`flex-1 py-3 mx-1 rounded-lg ${
-              pestanaActiva === pestana ? 'bg-blue-800' : 'bg-gray-300'
+              pestanaActiva === pestana ? 'bg-primary' : 'bg-gray-300'
             }`}
           >
             <Text
@@ -44,21 +59,53 @@ const Plan = () => {
 
       {/* Contenido según pestaña */}
       <View className="flex-1">
-        {pestanaActiva === 'objetivos' && <ListaObjetivos />}
-        {pestanaActiva === 'metas' && <Text>Aquí van las metas...</Text>}
-        {pestanaActiva === 'actividades' && <Text>Aquí van las actividades...</Text>}
-      </View>
+        
+        {/* Objetivos */}
+        {pestanaActiva === 'objetivos' && (
+          <>
+            {objetivos.length === 0 ? (
+              <View className="flex-1 justify-center items-center mt-10">
+                <Text className="text-lg text-gray-500">
+                  Aún no tienes objetivos en tu plan de trabajo.
+                </Text>
+              </View>
+            ) : (
+              <ListaObjetivos objetivos={objetivos} />
+            )}
+          </>
+        )}
 
-      {pestanaActiva === 'objetivos' && (
-        <>
-          <TouchableOpacity
-            onPress={handleAgregar}
-            className="absolute bottom-6 right-6 bg-blue-600 rounded-full w-14 h-14 items-center justify-center shadow-lg"
-          >
-            <Text className="text-white text-xl">＋</Text>
-          </TouchableOpacity>
-        </>
-                )}
+        {/* Metas */}
+        {pestanaActiva === 'metas' && (
+          <>
+            {metas.length === 0 ? (
+              <View className="flex-1 justify-center items-center mt-10">
+                <Text className="text-lg text-gray-500">
+                  Aún no tienes metas en tu plan de trabajo.
+                </Text>
+              </View>
+            ) : (
+              <ListaObjetivos objetivos={metas} />
+            )}
+          </>
+        )}
+
+        {/* Actividades */}
+        {pestanaActiva === 'actividades' && (
+          <>
+            {actividades.length === 0 ? (
+              <View className="flex-1 justify-center items-center mt-10">
+                <Text className="text-lg text-gray-500">
+                  Aún no tienes actividades en tu plan de trabajo.
+                </Text>
+              </View>
+            ) : (
+              <ListaObjetivos objetivos={actividades} />
+            )}
+          </>
+        )}
+
+      </View>
 
     </View>
   )

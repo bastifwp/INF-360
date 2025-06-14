@@ -1,10 +1,10 @@
+import { View, Text } from 'react-native'
 import React from 'react'
-import { Text, View } from 'react-native'
 
 const Chat = () => {
   return (
     <View>
-      <Text>Chat je</Text>
+      <Text>En construcción</Text>
     </View>
   )
 }
