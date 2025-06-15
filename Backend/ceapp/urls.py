@@ -8,7 +8,10 @@ from .views.views import (
     BitacoraEntradaView,
     ProfesionalPlanTrabajoView,
     BitacoraEntradaObjetivoView,
-    CustomObtainPairView
+    CustomObtainPairView,
+    ObjetivosPorPlanView,
+    ObjetivoDetailView,
+    BitacoraPorPlanView
 )
 
 #importar vistas para login
@@ -28,4 +31,13 @@ urlpatterns = [
     path('bitacora-entrada/', BitacoraEntradaView.as_view(), name='bitacora-entrada'),
     path('profesional-plan-trabajo/', ProfesionalPlanTrabajoView.as_view(), name='profesional-plan-trabajo'),
     path('bitacora-entrada-objetivo/', BitacoraEntradaObjetivoView.as_view(), name='bitacora-entrada-objetivo'),
+
+    # Objetivos según plan
+    path('objetivos/<int:id_plan>/', ObjetivosPorPlanView.as_view(), name='objetivos-por-plan'),
+
+    # Objetivo individual (GET, PUT, DELETE)
+    path('objetivos/detalle/<int:id_obj>/', ObjetivoDetailView.as_view(), name='objetivo-detalle'),
+
+    # Bitácora según plan
+    path('bitacora/<int:id_plan>/', BitacoraPorPlanView.as_view(), name='bitacora-por-plan'),
 ]

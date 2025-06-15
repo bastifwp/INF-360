@@ -75,11 +75,39 @@ class ObjetivoSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['autor_creacion', 'fecha_creacion', 'autor_modificacion', 'fecha_modificacion']
 
+class ObjetivoLiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Objetivo
+        fields = ['id', 'titulo', 'categoria']
+
+
 class BitacoraEntradaSerializer(serializers.ModelSerializer):
+    objetivos = serializers.SerializerMethodField(read_only=True)
+    selected_obj = serializers.ListField(
+        child=serializers.IntegerField(), write_only=True, required=False
+    )
+
     class Meta:
         model = BitacoraEntrada
-        fields = '__all__'
+        fields = ['id', 'fecha', 'titulo', 'comentarios', 'plan_trabajo', 'autor', 'objetivos', 'selected_obj']
 
+    def get_objetivos(self, obj):
+        objetivos_relacionados = obj.objetivos_relacionados.select_related('objetivo')
+        objetivos = [rel.objetivo for rel in objetivos_relacionados]
+        return ObjetivoLiteSerializer(objetivos, many=True).data
+
+    def create(self, validated_data):
+        selected_obj = validated_data.pop('selected_obj', [])
+        bitacora = BitacoraEntrada.objects.create(**validated_data)
+
+        for obj_id in selected_obj:
+            try:
+                objetivo = Objetivo.objects.get(id=obj_id)
+                BitacoraEntradaObjetivo.objects.create(bitacora_entrada=bitacora, objetivo=objetivo)
+            except Objetivo.DoesNotExist:
+                continue
+
+        return bitacora
 class ProfesionalPlanTrabajoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfesionalPlanTrabajo
