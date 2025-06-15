@@ -1,4 +1,5 @@
 from django.shortcuts import render
+<<<<<<< HEAD
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -24,14 +25,40 @@ class CustomObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
+=======
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from ..serializers import RegisterSerializer  
+from ..permissions import EsCuidador, EsProfesional
+
+# Clases de ejemplo
+
+class VistaCuidador(APIView):
+    permission_classes = [EsCuidador]
+
+    def get(self, request):
+        return Response({"mensaje": "Hola cuidador"})
+
+class VistaProfesional(APIView):
+    permission_classes = [EsProfesional]
+
+    def get(self, request):
+        return Response({"mensaje": "Hola profesional"})
+>>>>>>> frontend
 
 class RegisterView(APIView):
     def post(self, request):
         print(request)
+<<<<<<< HEAD
+=======
+
+>>>>>>> frontend
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+<<<<<<< HEAD
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
@@ -372,4 +399,6 @@ class BitacoraPorPlanView(APIView):
                     continue
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+=======
+>>>>>>> frontend
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

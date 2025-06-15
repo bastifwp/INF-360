@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
+import { View, Text } from "react-native";
 import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
 
 import { useAuth } from "./context/auth";
 

@@ -1,8 +1,8 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react'
+import { View, Text, TouchableOpacity } from 'react-native'
+import { useRouter, useLocalSearchParams } from "expo-router";
 
-import ListaObjetivos from "../../../components/cuidador/ListaObjetivos";
+import ListaObjetivos from "../../../components/cuidador/ListaObjetivos"
 
 const objetivos = [
   {
