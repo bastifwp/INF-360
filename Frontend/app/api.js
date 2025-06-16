@@ -34,7 +34,7 @@ import axios from 'axios';
 export const createApi = (authToken, refreshToken, setAuthToken) => {
 
     const api = axios.create({
-    baseURL: 'http://192.168.185.65:8000',
+    baseURL: 'http://localhost:8000',
     });
 
     // Agrega token a cada solicitud
@@ -60,7 +60,7 @@ export const createApi = (authToken, refreshToken, setAuthToken) => {
 
         if (refreshToken) {
             try {
-            const res = await axios.post('http://192.168.185.65:8000/token/refresh/', {
+            const res = await axios.post('http://localhost:8000/token/refresh/', {
                 refresh: refreshToken,
             });
 
