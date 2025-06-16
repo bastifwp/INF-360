@@ -249,7 +249,7 @@ const FormularioObjetivo = () => {
             api
                 .put('/objetivos/detalle/'+id+'/', {titulo: titulo,descripcion: descripcion, categoria:  categoria})
                 .then(res => console.log(res.data))
-                .catch(err => console.log(err))      
+                .catch(err => {console.log(err); Alert.alert("Error", "No se pudo editar el objetivo")})      
           };
 
         } else {
@@ -264,7 +264,7 @@ const FormularioObjetivo = () => {
             api
                 .post('/objetivos/'+paciente_id+'/', {titulo: titulo, descripcion: descripcion, categoria:  categoria})
                 .then(res => console.log(res.data))
-                .catch(err => console.log(err))      
+                .catch(err => {console.log(err); Alert.alert("Error", "No se pudo crear el objetivo")})      
           };
         
             //LLAMADA A LA API
@@ -273,7 +273,7 @@ const FormularioObjetivo = () => {
         }
         Alert.alert(
             'Éxito',
-            'Objetivo  guardado correctamente',
+            'Objetivo guardado correctamente',
             [
               {
                 text: 'OK',

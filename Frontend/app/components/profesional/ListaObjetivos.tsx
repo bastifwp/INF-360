@@ -13,7 +13,7 @@ const categoriaColores = {
   default: '#b0bec5'        // Gris por defecto
 };
 
-const ObjetivoItem = ({ objetivo }) => {
+const ObjetivoItem = ({ objetivo, onChange }) => {
 
   const router = useRouter();
   const [expandido, setExpandido] = useState(false);
@@ -33,19 +33,29 @@ const ObjetivoItem = ({ objetivo }) => {
         { text: 'Eliminar', onPress: () => console.log('Eliminado', objetivo.id), style: 'destructive' },
       ]
     );*/
-    {
-      if (!authToken || !refreshToken) return;
+      {
+        if (!authToken || !refreshToken) return;
 
-      const api = createApi(authToken, refreshToken, setAuthToken);
+        const api = createApi(authToken, refreshToken, setAuthToken);
 
-      api
-          .delete('/objetivos/detalle/'+objetivo.id+'/')
-          .then(res => console.log(res.data))
-          .catch(err => console.log(err))      
-    };
-
-
+        api
+            .delete('/objetivos/detalle/'+objetivo.id+'/')
+            .then(res => {console.log(res.status);
+                          onChange()})
+            .catch(err => {
+                            if (!err.request){
+                              // El servidor respondió con un código de error HTTP y no es porque el body de
+                              // la respuesta esté vacío
+                              console.log('Error al eliminar objetivo:', err.message);
+                              //console.log('Error en respuesta:', err.response.status);
+                              //console.log('Datos:', err.response.data);
+                            }
+                            onChange();
+                          });
+                          
+      }      
   };
+    
 
   const colorCategoria = categoriaColores[objetivo.categoria] || categoriaColores.default;
 
@@ -131,12 +141,12 @@ const ObjetivoItem = ({ objetivo }) => {
   );
 };
 
-const ListaObjetivos = ({ objetivos }) => {
+const ListaObjetivos = ({ objetivos, onChange }) => {
   return (
     <FlatList
       data={objetivos}
       keyExtractor={item => item.id}
-      renderItem={({ item }) => <ObjetivoItem objetivo={item} />}
+      renderItem={({ item }) => <ObjetivoItem objetivo={item} onChange={onChange} />}
       contentContainerStyle={{ paddingBottom: 55 }}
     />
   );

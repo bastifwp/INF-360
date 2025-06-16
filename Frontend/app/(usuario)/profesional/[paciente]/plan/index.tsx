@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, Alert } from 'react-native'
 import { useRouter, useLocalSearchParams } from "expo-router";
 
 import { useAuth } from '@/app/context/auth';
 import ListaObjetivos from "../../../../components/profesional/ListaObjetivos"
 
+/*
 const objetivos = [
   {
     id: '1',
@@ -17,7 +18,7 @@ const objetivos = [
     fecha_modificacion: '2025-05-01',
   }
 ]
-
+*/
 const metas = []
 
 const actividades = []
@@ -34,6 +35,7 @@ const Plan = () => {
 
   const [id, encodedNombre] = paciente?.split("-") ?? [null, null];
 
+  
   useEffect(() => {
   
     if (!authToken || !refreshToken) return;
@@ -45,6 +47,20 @@ const Plan = () => {
         .then(res => setObjetivos(res.data))
         .catch(err => console.log(err));
   },[authToken, refreshToken]); // 👈 se ejecuta cada vez que cambien
+  
+
+  const fetchObjetivos = () => {
+  if (!authToken || !refreshToken) return;
+
+  const api = createApi(authToken, refreshToken, setAuthToken);
+
+  api
+    .get('/objetivos/'+id+'/')
+    .then(res => setObjetivos(res.data))
+    .catch(err => {console.log(err); Alert.alert("Error", "Error al cargar plan de trabajo")});
+  };
+
+  //fetchObjetivos()
 
   const handleAgregar = () => {
     console.log('[./app/(usuario)/profesional/[paciente]/plan/index.tsx] Agregando objetivo...')
@@ -89,7 +105,7 @@ const Plan = () => {
                 </Text>
               </View>
             ) : (
-              <ListaObjetivos objetivos={objetivos} />
+              <ListaObjetivos objetivos={objetivos} onChange={fetchObjetivos}/>
             )}
             <TouchableOpacity
               onPress={handleAgregar}
@@ -110,7 +126,7 @@ const Plan = () => {
                 </Text>
               </View>
             ) : (
-              <ListaObjetivos objetivos={metas} />
+              <ListaObjetivos objetivos={metas} onChange={fetchObjetivos}/>
             )}
           </>
         )}
@@ -125,7 +141,7 @@ const Plan = () => {
                 </Text>
               </View>
             ) : (
-              <ListaObjetivos objetivos={actividades} />
+              <ListaObjetivos objetivos={actividades} onChange={fetchObjetivos}/>
             )}
           </>
         )}
