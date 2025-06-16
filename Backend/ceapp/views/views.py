@@ -1,5 +1,4 @@
 from django.shortcuts import render
-<<<<<<< HEAD
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -25,40 +24,14 @@ class CustomObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
-=======
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from ..serializers import RegisterSerializer  
-from ..permissions import EsCuidador, EsProfesional
-
-# Clases de ejemplo
-
-class VistaCuidador(APIView):
-    permission_classes = [EsCuidador]
-
-    def get(self, request):
-        return Response({"mensaje": "Hola cuidador"})
-
-class VistaProfesional(APIView):
-    permission_classes = [EsProfesional]
-
-    def get(self, request):
-        return Response({"mensaje": "Hola profesional"})
->>>>>>> frontend
 
 class RegisterView(APIView):
     def post(self, request):
         print(request)
-<<<<<<< HEAD
-=======
-
->>>>>>> frontend
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
-<<<<<<< HEAD
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
@@ -198,7 +171,8 @@ class ProfesionalPlanTrabajoView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        objetos = ProfesionalPlanTrabajo.objects.all()
+        user = request.user
+        objetos = ProfesionalPlanTrabajo.objects.filter(profesional=user)
         serializer = ProfesionalPlanTrabajoSerializer(objetos, many=True)
         return Response(serializer.data)
 
@@ -297,13 +271,25 @@ class ObjetivosPorPlanView(APIView):
 class ObjetivoDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
-    # def get(self, request, id_obj):
-    #     try:
-    #         obj = Objetivo.objects.get(id=id_obj)
-    #     except Objetivo.DoesNotExist:
-    #         return Response({'detail': 'No encontrado'}, status=status.HTTP_404_NOT_FOUND)
-    #     serializer = ObjetivoSerializer(obj)
-    #     return Response(serializer.data)
+    def get(self, request, id_obj):
+        user = request.user
+
+        try:
+            objetivo = Objetivo.objects.select_related('plan_trabajo').get(id=id_obj)
+        except Objetivo.DoesNotExist:
+            return Response({'detail': 'No encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Verificar si el usuario es un profesional asociado al plan del objetivo
+        esta_asociado = ProfesionalPlanTrabajo.objects.filter(
+            profesional=user,
+            plan_trabajo=objetivo.plan_trabajo
+        ).exists()
+
+        if not esta_asociado:
+            return Response({'detail': 'No autorizado'}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = ObjetivoSerializer(objetivo)
+        return Response(serializer.data)
 
     def put(self, request, id_obj):
         try:
@@ -399,6 +385,4 @@ class BitacoraPorPlanView(APIView):
                     continue
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-=======
->>>>>>> frontend
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

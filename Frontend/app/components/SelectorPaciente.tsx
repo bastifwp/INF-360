@@ -1,12 +1,54 @@
 import { Text, View, TouchableOpacity,  ScrollView } from 'react-native';
+import { useEffect } from 'react';
 import { Link } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import axios from 'axios';
+import { useAuth } from "../context/auth";
+//import {createApi} from '../api';
+
+
+//const { authToken } = useAuth();
 
 const pacientes = [
   { id: "1", nombre: "Juanita Pérez", cuidador: "J. PG"},
   { id: "2", nombre: "Juan Pérez", cuidador: "Alice López"},
   { id: "3", nombre: "María López", cuidador: "Bob López"},
 ];
+
+/*
+const get_pac = async (email: string, password: string): Promise<any> => {
+  try{
+    const pac = await axios.get("http://192.168.185.65:8000/profesional-plan-trabajo/",
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      }
+    )
+
+  }
+  catch(error: unknown){
+    console.log(" Failed first req ")
+
+  }
+  
+}
+*/
+// const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
+
+// useEffect(() => {
+
+//   if (!authToken || !refreshToken) return;
+
+//   const api = createApi(authToken, refreshToken, setAuthToken);
+
+//    api
+//       .get('/profesional-plan-trabajo/')
+//       .then(res => console.log(res.data))
+//       .catch(err => console.log(err));
+//  },[authToken, refreshToken]); // 👈 se ejecuta cada vez que cambien
+
+
 
 const PacienteItem = ({ paciente, rol }: { paciente: any, rol: string }) => {
   return (
@@ -43,6 +85,21 @@ export default function SelectorPaciente({
     rol: "profesional" | "cuidador";
     nombre: string;
   }) {
+    
+  const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
+
+  useEffect(() => {
+
+    if (!authToken || !refreshToken) return;
+
+    const api = createApi(authToken, refreshToken, setAuthToken);
+
+    api
+        .get('/profesional-plan-trabajo/')
+        .then(res => console.log(res.data))
+        .catch(err => console.log(err));
+  },[authToken, refreshToken]); // 👈 se ejecuta cada vez que cambien
+
 
   const primer_nombre = nombre.split(" ")[0];
 

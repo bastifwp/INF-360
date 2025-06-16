@@ -2,43 +2,11 @@ import axios from 'axios';
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
 //CHATGPT ME RECOMNEDO ESTO:
-//import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from 'expo-secure-store';
 //probar -> npx expo install expo-secure-store
 
 
 
-/*
-const AuthContext = createContext(null);
-
-export function AuthProvider({ children }) {
-
-  const [user, setUser] = useState(null);
-
-  const login = (correo, contrasena) => {
-    if (correo === "usuario@demo.com" && contrasena === "123456") {
-      setUser({ correo, id: 1, nombre: "Juanita Pérez", rol: "profesional" });
-      return { success: true };
-    }
-    if (correo === "cuidador@demo.com" && contrasena === "123456") {
-      setUser({ correo, id: 2, nombre: "Juanita Pérez", rol: "cuidador" });
-      return { success: true };
-    }
-    return { success: false, message: "Credenciales inválidas" };
-  };
-
-  const logout = () => {
-    setUser(null);
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
-  
-}
-
-export const useAuth = () => useContext(AuthContext);*/
 
 //Definimos tipos de datos para que no llore el react
 type User = {
@@ -54,6 +22,8 @@ type AuthContextType = {
   user: User | null;
   login: (email: string, password: string) => Promise<void>; 
   logout: () => void;
+  setAuthToken: (arg1: string | null) => void;
+  createApi: (authToken, refreshToken, setAuthToken) => any;
 }
 
 type AuthProviderType = {
@@ -78,12 +48,12 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
       //Para acceder desde el celular la ruta es: http://<ipv4 del pc>:8000/token 
       //Eso pasa porque el celular no hace la conuslta al localhost (a el mismo) sino que lo hace al pc
     try{
-      const response = await axios.post('http://localhost:8000/token/', {
+      const response = await axios.post('http://192.168.185.65:8000/token/', {
         username: email,
         password: password
       });
 
-
+      
       console.log("Token_obtained");
       console.log(response.data);
 
@@ -110,15 +80,70 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
     setUser(null);
   };
 
+  const createApi = (authToken, refreshToken, setAuthToken) => {
+
+      const api = axios.create({
+      baseURL: 'http://192.168.185.65:8000',
+      });
+
+      // Agrega token a cada solicitud
+      api.interceptors.request.use(async config => {
+      //const token = await SecureStore.getItemAsync('accessToken');
+      
+      if (authToken) {
+          config.headers['Authorization'] = `Bearer ${authToken}`;
+      }
+      return config;
+      });
+
+      // Intenta refrescar el token si expiró
+      api.interceptors.response.use(
+      response => response,
+      async error => {
+          const originalRequest = error.config;
+
+          if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
+          //const refreshToken = await SecureStore.getItemAsync('refreshToken');
+
+          if (refreshToken) {
+              try {
+              const res = await axios.post('http://192.168.185.65:8000/token/refresh/', {
+                  refresh: refreshToken,
+              });
+
+              const newAccess = res.data.access;
+              //await SecureStore.setItemAsync('accessToken', newAccess);
+              setAuthToken(newAccess);
+
+              originalRequest.headers['Authorization'] = `Bearer ${newAccess}`;
+              return api(originalRequest);
+              } catch (e) {
+              console.error("No se pudo refrescar el token", e);
+              // Opcional: redirigir al login o limpiar sesión
+              }
+          }
+          }
+
+          return Promise.reject(error);
+      }
+      );
+
+      return api
+  };
+
 
   //Al llamarlo entonces tendra acceso a las cosas que aparecen en value definidas en el tipo de datos más arriba
   return (
-    <AuthContext.Provider value={{ authToken, refreshToken, user, login, logout }}>
+    <AuthContext.Provider value={{ authToken, refreshToken, user, login, logout, createApi, setAuthToken}}>
       {children}
     </AuthContext.Provider>
   );
 
 };
+
+  
 
 //useAuth nos servirá para llamar al contexto desde cualquier parte
 export const useAuth = (): AuthContextType => {

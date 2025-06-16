@@ -63,7 +63,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
     
 # Esqueletos de serializers para pruebas
-    
 class PlanTrabajoSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlanTrabajo
@@ -108,10 +107,20 @@ class BitacoraEntradaSerializer(serializers.ModelSerializer):
                 continue
 
         return bitacora
+    
+
 class ProfesionalPlanTrabajoSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='plan_trabajo.id')
+    nombre = serializers.CharField(source='plan_trabajo.nombre')
+    cuidador = serializers.SerializerMethodField()
+
     class Meta:
         model = ProfesionalPlanTrabajo
-        fields = '__all__'
+        fields = ['id', 'nombre', 'cuidador']
+
+    def get_cuidador(self, obj):
+        cuidador = obj.plan_trabajo.cuidador
+        return f"{cuidador.first_name} {cuidador.last_name}".strip() if cuidador else None
 
 class BitacoraEntradaObjetivoSerializer(serializers.ModelSerializer):
     class Meta:
