@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from ..serializers import (
     RegisterSerializer, PlanTrabajoSerializer, ProfesionalPlanTrabajoSerializer,
     ObjetivoSerializer, BitacoraEntradaSerializer, BitacoraEntradaObjetivoSerializer,
-    CustomTokenObtainPairSerializer
+    CustomTokenObtainPairSerializer, ObjetivoPOSTSerializer
 )
 from ..models import (
     PlanTrabajo, ProfesionalPlanTrabajo, Objetivo,
@@ -17,6 +17,8 @@ from ..permissions import EsCuidador, EsProfesional
 
 #Lo importamos para extenderlo y poder ocupar el serializer q definimos
 from rest_framework_simplejwt.views import TokenObtainPairView
+
+from django.shortcuts import get_object_or_404
 
 
 #overwrite al serializer por default al nuestro
@@ -89,14 +91,21 @@ class ObjetivoView(APIView):
         serializer = ObjetivoSerializer(objetos, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
+    '''
+    Este creo que no se ocupa
+    def post(self, request, id_plan):
         if not EsProfesional().has_permission(request, self):
             return Response({'detail': 'No autorizado'}, status=status.HTTP_403_FORBIDDEN)
-        serializer = ObjetivoSerializer(data=request.data)
+        
+        data = request.data.copy()
+        data['plan_trabajo_id'] = id_plan
+  
+        serializer = ObjetivoPOSTSerializer(data=data)
         if serializer.is_valid():
             serializer.save(autor_creacion=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    '''
 
     def put(self, request):
         if not EsProfesional().has_permission(request, self):
@@ -261,7 +270,8 @@ class ObjetivosPorPlanView(APIView):
         data = request.data.copy()
         data['plan_trabajo'] = id_plan
 
-        serializer = ObjetivoSerializer(data=data)
+        serializer = ObjetivoPOSTSerializer(data=data)
+
         if serializer.is_valid():
             serializer.save(autor_creacion=user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -376,7 +386,7 @@ class BitacoraPorPlanView(APIView):
             entrada = serializer.save(autor=user)
 
             # Asociar objetivos si vienen
-            selected_obj = request.data.get('selected_obj', [])
+            selected_obj = serializer.selected_obj #request.data.get('selected_obj', [])
             for obj_id in selected_obj:
                 try:
                     obj = Objetivo.objects.get(id=obj_id)

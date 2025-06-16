@@ -1,5 +1,5 @@
 import { Text, View, TouchableOpacity,  ScrollView } from 'react-native';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import axios from 'axios';
@@ -87,8 +87,11 @@ export default function SelectorPaciente({
   }) {
     
   const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
+  const [pacientes, setPacientes] = useState([]);
+
 
   useEffect(() => {
+  
 
     if (!authToken || !refreshToken) return;
 
@@ -96,7 +99,7 @@ export default function SelectorPaciente({
 
     api
         .get('/profesional-plan-trabajo/')
-        .then(res => console.log(res.data))
+        .then(res => setPacientes(res.data))
         .catch(err => console.log(err));
   },[authToken, refreshToken]); // 👈 se ejecuta cada vez que cambien
 
@@ -114,6 +117,7 @@ export default function SelectorPaciente({
         <Text className="text-xl font-bold text-secondary mb-6">
           Selecciona un paciente para comenzar
         </Text>
+
       </View> 
 
       {/* Lista de pacientes */}

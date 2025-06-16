@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, TouchableOpacity } from 'react-native'
 import { useRouter, useLocalSearchParams } from "expo-router";
 
+import { useAuth } from '@/app/context/auth';
 import ListaObjetivos from "../../../../components/profesional/ListaObjetivos"
 
 const objetivos = [
@@ -25,7 +26,25 @@ const Plan = () => {
 
   const router = useRouter();
   const { paciente } = useLocalSearchParams();
+
   const [pestanaActiva, setPestanaActiva] = useState<'objetivos' | 'metas' | 'actividades'>('objetivos')
+  const [objetivos, setObjetivos] = useState([]);
+
+  const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
+
+  const [id, encodedNombre] = paciente?.split("-") ?? [null, null];
+
+  useEffect(() => {
+  
+    if (!authToken || !refreshToken) return;
+
+    const api = createApi(authToken, refreshToken, setAuthToken);
+
+    api
+        .get('/objetivos/'+id+'/')
+        .then(res => setObjetivos(res.data))
+        .catch(err => console.log(err));
+  },[authToken, refreshToken]); // 👈 se ejecuta cada vez que cambien
 
   const handleAgregar = () => {
     console.log('[./app/(usuario)/profesional/[paciente]/plan/index.tsx] Agregando objetivo...')

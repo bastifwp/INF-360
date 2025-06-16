@@ -1,13 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 
+/*
 const objetivos = [
   { id: 1, nombre: 'Mejorar comunicación', categoria: 'Comunicación' },
   { id: 2, nombre: 'Fomentar autonomía', categoria: 'Motricidad' },
   { id: 3, nombre: 'Desarrollar habilidades motoras', categoria: 'Motricidad' },
   { id: 4, nombre: 'Reducir conductas disruptivas', categoria: 'Conducta' },
 ];
-
+*/
 const categoriaColores = {
   Comunicación: '#4f83cc',
   Motricidad: '#81c784',
@@ -24,7 +25,7 @@ export default function CustomMultiSelect({ items, selected, onChange }) {
   const filteredItems = useMemo(() => {
     if (!search) return items;
     return items.filter(item =>
-      item.nombre.toLowerCase().includes(search.toLowerCase())
+      item.titulo.toLowerCase().includes(search.toLowerCase())
     );
   }, [search, items]);
 
@@ -59,7 +60,7 @@ export default function CustomMultiSelect({ items, selected, onChange }) {
                 alignItems: 'center',
               }}
             >
-              <Text style={{ color: 'white', marginRight: 6 }}>{item.nombre}</Text>
+              <Text style={{ color: 'white', marginRight: 6 }}>{item.titulo}</Text>
               <TouchableOpacity onPress={() => toggleItem(id)}>
                 <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20 }}>×</Text>
               </TouchableOpacity>
@@ -102,7 +103,7 @@ export default function CustomMultiSelect({ items, selected, onChange }) {
                 marginBottom: 6,
                 }}
             >
-                <Text style={{ color: isSelected ? color : '#333' }}>{item.nombre}</Text>
+                <Text style={{ color: isSelected ? color : '#333' }}>{item.titulo}</Text>
             </TouchableOpacity>
             );
         })}

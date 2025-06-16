@@ -20,31 +20,7 @@ const categoriaColores = {
   default: '#b0bec5',       // Gris
 };
 
-// ✅ Lista de entradas ejemplo con selectedObj como lista de objetos
-const entradas = [
-  {
-    id: '1',
-    nombre: 'Sesión de Terapia Ocupacional',
-    autor: 'Dr. Smith',
-    fecha: '2025-05-01',
-    descripcion: 'Hoy Juanito Perez estaba muy cansado y no quiso realizar todas las actividades',
-    selectedObj: [
-      { nombre: 'Mejorar comunicación', categoria: 'Comunicación' },
-      { nombre: 'Motricidad gruesa', categoria: 'Motricidad' },
-    ],
-  },
-  {
-    id: '2',
-    nombre: 'Sesión de Fonoaudiología',
-    autor: 'Dra. López',
-    fecha: '2025-04-15',
-    descripcion: 'Hoy Juanito Perez estaba de buen ánimo y trabajó de buena manera',
-    selectedObj: [
-      { nombre: 'Desarrollar lenguaje', categoria: 'Comunicación' },
-    ],
-  },
-  // Puedes agregar más entradas si quieres
-];
+
 
 // ✅ Componente de ítem individual
 const EntradaItem = ({ entrada }) => {
@@ -70,7 +46,7 @@ const EntradaItem = ({ entrada }) => {
           style={{ width: 40, height: 40, marginRight: 12, borderRadius: 20 }}
         />
         <View style={{ flex: 1 }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{entrada.nombre}</Text>
+          <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{entrada.titulo}</Text>
           <Text style={{ color: '#555' }}>{`Fecha: ${entrada.fecha}`}</Text>
           <Text style={{ color: '#555' }}>{`Autor: ${entrada.autor}`}</Text>
         </View>
@@ -84,8 +60,8 @@ const EntradaItem = ({ entrada }) => {
 
       {expandido && (
         <>
-          <View style={{ padding: 8, backgroundColor: 'white', marginVertical: 8, borderRadius: 8 }}>
-            <Text>{entrada.descripcion}</Text>
+          <View style={{ padding: 8, marginVertical: 8, borderRadius: 8, backgroundColor: "#ffffff"}}>
+            <Text className='text-black'>{entrada.comentarios}</Text>
           </View>
           <Text style={{ marginLeft: 8, fontWeight: 'bold' }}>Objetivos trabajados</Text>
           <View style={{ marginTop: 8 }}>
@@ -101,7 +77,7 @@ const EntradaItem = ({ entrada }) => {
                   alignItems: 'center',
                 }}
               >
-                <Text style={{ color: 'white', fontWeight: 'bold' }}>{item.nombre}</Text>
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>{item.titulo}</Text>
               </View>
             ))}
           </View>
@@ -112,7 +88,7 @@ const EntradaItem = ({ entrada }) => {
 };
 
 // ✅ Lista principal
-const ListaEntradas = () => {
+const ListaEntradas = ({ entradas }) => {
   return (
     <FlatList
       data={entradas}

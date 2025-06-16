@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, FlatList } from 'react-native';
 import { useRouter, useLocalSearchParams, useNavigation } from "expo-router";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+
 import { DescartarCambiosContext } from '../../../../context/DescartarCambios';
 import CustomMultiSelect  from '../../../../components/profesional/SelectObjetivos'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useAuth } from '@/app/context/auth';
 
 // === Lista de objetivos CON categoría ===
 const objetivos = [
@@ -27,35 +29,52 @@ const EntradaAgregar = () => {
   const router = useRouter();
   const navigation = useNavigation();
   const { paciente } = useLocalSearchParams();
+  const [paciente_id, encodedNombre] = paciente?.split("-") ?? [null, null];
 
   const [titulo, setTitulo] = useState('');
   const [comentarios, setComentarios] = useState('');
-  const [selectedObj, setSelectedObj] = useState<number[]>([]);
+  const [selected_obj, setSelected_obj] = useState<number[]>([]);
 
+ const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
+
+  const [entrada, setEntrada] = useState({});
+  const [objetivos, setObjetivos] = useState([]);
+
+
+  //Hacemos la consulta para tener todos los objetivos de la base de datos
+  if (!authToken || !refreshToken) return;
+
+  const api = createApi(authToken, refreshToken, setAuthToken);
+
+  api
+      .get('/objetivos/'+paciente_id+'/')
+      .then(res => setObjetivos(res.data))
+      .catch(err => console.log(err));
+
+    
   const datosIniciales = useRef({
     titulo: '',
     comentarios: '',
-    selectedObj: {},
+    selected_obj: {},
   });
 
   useEffect(() => {
     datosIniciales.current = {
       titulo: '',
       comentarios: '',
-      selectedObj: {},
+      selected_obj: {},
     };
   }, []);
-
 
   const hayCambios = () => {
     if (titulo !== datosIniciales.current.titulo) return true;
     if (comentarios !== datosIniciales.current.comentarios) return true;
     const keys = new Set([
-      ...Object.keys(selectedObj),
-      ...Object.keys(datosIniciales.current.selectedObj),
+      ...Object.keys(selected_obj),
+      ...Object.keys(datosIniciales.current.selected_obj),
     ]);
     for (const k of keys) {
-      if (!!selectedObj[k] !== !!datosIniciales.current.selectedObj[k]) return true;
+      if (!!selected_obj[k] !== !!datosIniciales.current.selected_obj[k]) return true;
     }
     return false;
   };
@@ -78,9 +97,8 @@ const EntradaAgregar = () => {
         ]
       );
     });
-
     return beforeRemoveListener;
-  }, [navigation, titulo, comentarios, selectedObj]);
+  }, [navigation, titulo, comentarios, selected_obj]);
 
   // DESCARTAR CAMBIOS
   const handleDescartarCambiosEntrada = (path) => {
@@ -103,18 +121,34 @@ const EntradaAgregar = () => {
   };
 
   const handleGuardar = () => {
-    if (!titulo || !comentarios || !selectedObj) {
+    if (!titulo || !comentarios || !selected_obj) {
       Alert.alert('Error', 'Por favor completa todos los campos y selecciona un objetivo');
       return;
     }
+    console.log(selected_obj);
     console.log('Guardar entrada:', {
       titulo,
       comentarios,
       paciente,
-      objetivosSeleccionados: objetivos.filter(obj =>
-                                selectedObj.includes(obj.id)
-                              )
+      selected_obj
     });
+
+    //LLAMADA POST A API
+    {
+      if (!authToken || !refreshToken) return;
+
+      const api = createApi(authToken, refreshToken, setAuthToken);
+
+      api
+          .post('/bitacora/'+paciente_id+'/', {
+                                              titulo,
+                                              comentarios,
+                                              paciente,
+                                              selected_obj
+          })
+          .then(res => console.log(res.data))
+          .catch(err => console.log(err))      
+    };
 
     Alert.alert(
     'Éxito',
@@ -153,8 +187,8 @@ const EntradaAgregar = () => {
         <Text className="font-semibold mb-2">Objetivo</Text>
         <CustomMultiSelect
           items={objetivos}
-          selected={selectedObj}
-          onChange={setSelectedObj}
+          selected={selected_obj}
+          onChange={setSelected_obj}
         />
 
         <Text className="font-semibold mb-2">Comentarios</Text>

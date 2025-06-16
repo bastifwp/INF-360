@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, FlatList, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from "expo-router";
+
+import { useAuth } from '@/app/context/auth';
 
 const categoriaColores = {
   Comunicación: '#4f83cc',  // Azul
@@ -12,23 +14,37 @@ const categoriaColores = {
 };
 
 const ObjetivoItem = ({ objetivo }) => {
+
   const router = useRouter();
   const [expandido, setExpandido] = useState(false);
   const { paciente } = useLocalSearchParams();
+  const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
 
   const handleEditar = () => {
     router.push(`/profesional/${paciente}/plan/objetivo-editar?id=${objetivo.id}`);
   };
 
   const handleEliminar = () => {
-    Alert.alert(
+    /*Alert.alert(
       'Eliminar objetivo',
       `¿Estás seguro que quieres eliminar "${objetivo.titulo}"?`,
       [
         { text: 'Cancelar', style: 'cancel' },
         { text: 'Eliminar', onPress: () => console.log('Eliminado', objetivo.id), style: 'destructive' },
       ]
-    );
+    );*/
+    {
+      if (!authToken || !refreshToken) return;
+
+      const api = createApi(authToken, refreshToken, setAuthToken);
+
+      api
+          .delete('/objetivos/detalle/'+objetivo.id+'/')
+          .then(res => console.log(res.data))
+          .catch(err => console.log(err))      
+    };
+
+
   };
 
   const colorCategoria = categoriaColores[objetivo.categoria] || categoriaColores.default;

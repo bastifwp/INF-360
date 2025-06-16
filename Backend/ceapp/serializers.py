@@ -69,10 +69,40 @@ class PlanTrabajoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ObjetivoSerializer(serializers.ModelSerializer):
+    autor_creacion = serializers.CharField(source='autor_creacion.get_full_name', read_only=True)
+    autor_modificacion = serializers.CharField(source='autor_modificacion.get_full_name', read_only=True)
+    plan_trabajo = serializers.CharField(source='plan_trabajo.nombre', read_only=True)
+    fecha_creacion = serializers.SerializerMethodField()
+    fecha_modificacion = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Objetivo
+        fields = '__all__'
+        read_only_fields = [
+            'autor_creacion',
+            'fecha_creacion',
+            'autor_modificacion',
+            'fecha_modificacion',
+            'plan_trabajo',
+        ]
+
+    def get_fecha_creacion(self, obj):
+        if obj.fecha_creacion:
+            return obj.fecha_creacion.strftime('%d/%m/%Y')
+        return None
+
+    def get_fecha_modificacion(self, obj):
+        if obj.fecha_modificacion:
+            return obj.fecha_modificacion.strftime('%d/%m/%Y')
+        return None
+
+#Serializer para crear con POST un objetivo
+class ObjetivoPOSTSerializer(serializers.ModelSerializer):
     class Meta:
         model = Objetivo
         fields = '__all__'
         read_only_fields = ['autor_creacion', 'fecha_creacion', 'autor_modificacion', 'fecha_modificacion']
+
 
 class ObjetivoLiteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -81,6 +111,7 @@ class ObjetivoLiteSerializer(serializers.ModelSerializer):
 
 
 class BitacoraEntradaSerializer(serializers.ModelSerializer):
+    autor = serializers.CharField(source='autor.get_full_name', read_only=True) 
     objetivos = serializers.SerializerMethodField(read_only=True)
     selected_obj = serializers.ListField(
         child=serializers.IntegerField(), write_only=True, required=False
@@ -94,19 +125,11 @@ class BitacoraEntradaSerializer(serializers.ModelSerializer):
         objetivos_relacionados = obj.objetivos_relacionados.select_related('objetivo')
         objetivos = [rel.objetivo for rel in objetivos_relacionados]
         return ObjetivoLiteSerializer(objetivos, many=True).data
-
-    def create(self, validated_data):
-        selected_obj = validated_data.pop('selected_obj', [])
-        bitacora = BitacoraEntrada.objects.create(**validated_data)
-
-        for obj_id in selected_obj:
-            try:
-                objetivo = Objetivo.objects.get(id=obj_id)
-                BitacoraEntradaObjetivo.objects.create(bitacora_entrada=bitacora, objetivo=objetivo)
-            except Objetivo.DoesNotExist:
-                continue
-
-        return bitacora
+        
+    
+    # def create(self, validated_data):
+    #     validated_data.pop('selected_obj', None)  # Solo la sacamos si viene
+    #     return BitacoraEntrada.objects.create(**validated_data)
     
 
 class ProfesionalPlanTrabajoSerializer(serializers.ModelSerializer):
