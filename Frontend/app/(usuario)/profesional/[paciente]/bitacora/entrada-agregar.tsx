@@ -44,7 +44,6 @@ const EntradaAgregar = () => {
   //Hacemos la consulta para tener todos los objetivos de la base de datos
 
   useEffect(() => {
-    
       if (!authToken || !refreshToken) return;
   
       const api = createApi(authToken, refreshToken, setAuthToken);
@@ -151,7 +150,7 @@ const EntradaAgregar = () => {
                                               comentarios,
                                               paciente,
                                               selected_obj
-          })
+          }, {timeout: 5000})
           .then(res => {console.log(res.data);
                         Alert.alert(
                         'Éxito',
