@@ -99,7 +99,7 @@ export default function SelectorPaciente({
 
     api
         .get('/profesional-plan-trabajo/')
-        .then(res => setPacientes(res.data))
+        .then(res => {setPacientes(res.data);console.log(res.data);})
         .catch(err => console.log(err));
   },[authToken, refreshToken]); // 👈 se ejecuta cada vez que cambien
 
