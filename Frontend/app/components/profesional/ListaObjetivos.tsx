@@ -25,35 +25,37 @@ const ObjetivoItem = ({ objetivo, onChange }) => {
   };
 
   const handleEliminar = () => {
-    /*Alert.alert(
+    Alert.alert(
       'Eliminar objetivo',
       `¿Estás seguro que quieres eliminar "${objetivo.titulo}"?`,
       [
         { text: 'Cancelar', style: 'cancel' },
-        { text: 'Eliminar', onPress: () => console.log('Eliminado', objetivo.id), style: 'destructive' },
-      ]
-    );*/
-      {
-        if (!authToken || !refreshToken) return;
+        { text: 'Eliminar', onPress: () => {console.log('Eliminado', objetivo.id);
+          {
+            if (!authToken || !refreshToken) return;
 
-        const api = createApi(authToken, refreshToken, setAuthToken);
+            const api = createApi(authToken, refreshToken, setAuthToken);
 
-        api
-            .delete('/objetivos/detalle/'+objetivo.id+'/',{timeout:5000})
-            .then(res => {console.log(res.status);
-                          onChange()})
-            .catch(err => {
-                            if (!err.request){
-                              // El servidor respondió con un código de error HTTP y no es porque el body de
-                              // la respuesta esté vacío
-                              console.log('Error al eliminar objetivo:', err.message);
-                              //console.log('Error en respuesta:', err.response.status);
-                              //console.log('Datos:', err.response.data);
-                            }
-                            onChange();
-                          });
+            api
+                .delete('/objetivos/detalle/'+objetivo.id+'/',{timeout:5000})
+                .then(res => {console.log(res.status);
+                              onChange()})
+                .catch(err => {
+                                if (!err.request){
+                                  // El servidor respondió con un código de error HTTP y no es porque el body de
+                                  // la respuesta esté vacío
+                                  console.log('Error al eliminar objetivo:', err.message);
+                                  //console.log('Error en respuesta:', err.response.status);
+                                  //console.log('Datos:', err.response.data);
+                                }
+                                onChange();
+                              });
                           
-      }      
+          } 
+        }, style: 'destructive' },
+      ]
+    );
+           
   };
     
 

@@ -126,7 +126,7 @@ const EntradaAgregar = () => {
   };
 
   const handleGuardar = () => {
-    if (!titulo || !comentarios || !selected_obj) {
+    if (!titulo || !comentarios || selected_obj.length == 0) {
       Alert.alert('Error', 'Por favor completa todos los campos y selecciona un objetivo');
       return;
     }
