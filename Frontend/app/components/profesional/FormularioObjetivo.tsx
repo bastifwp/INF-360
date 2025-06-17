@@ -247,9 +247,32 @@ const FormularioObjetivo = () => {
             const api = createApi(authToken, refreshToken, setAuthToken);
 
             api
-                .put('/objetivos/detalle/'+id+'/', {titulo: titulo,descripcion: descripcion, categoria:  categoria})
-                .then(res => console.log(res.data))
-                .catch(err => {console.log(err); Alert.alert("Error", "No se pudo editar el objetivo")})      
+                .put('/objetivos/detalle/'+id+'/', {titulo: titulo,descripcion: descripcion, categoria:  categoria}, {timeout: 5000})
+                .then(res => {console.log(res.data)
+                              Alert.alert(
+                                  'Éxito',
+                                  'Objetivo guardado correctamente',
+                                  [
+                                    {
+                                      text: 'OK',
+                                      onPress: () => {
+                                        router.push(`/profesional/${paciente}/plan`);
+                                      },
+                                    },
+                              ])
+                })
+                .catch(err => {console.log(err);
+                               Alert.alert(
+                                  'Error',
+                                  'Objetivo no pudo ser editado',
+                                  [
+                                    {
+                                      text: 'OK',
+                                      onPress: () => {
+                                        router.push(`/profesional/${paciente}/plan`);
+                                      },
+                                    },
+                              ])})      
           };
 
         } else {
@@ -262,26 +285,38 @@ const FormularioObjetivo = () => {
             const api = createApi(authToken, refreshToken, setAuthToken);
 
             api
-                .post('/objetivos/'+paciente_id+'/', {titulo: titulo, descripcion: descripcion, categoria:  categoria})
-                .then(res => console.log(res.data))
-                .catch(err => {console.log(err); Alert.alert("Error", "No se pudo crear el objetivo")})      
+                .post('/objetivos/'+paciente_id+'/', {titulo: titulo, descripcion: descripcion, categoria:  categoria}, {timeout: 5000})
+                .then(res => {console.log(res.data);
+                              Alert.alert(
+                                  'Éxito',
+                                  'Objetivo guardado correctamente',
+                                  [
+                                    {
+                                      text: 'OK',
+                                      onPress: () => {
+                                        router.push(`/profesional/${paciente}/plan`);
+                                      },
+                                    },
+                              ])
+                })
+                .catch(err => {console.log(err); 
+                               Alert.alert(
+                                  'Error',
+                                  'Objetivo no pudo ser creado',
+                                  [
+                                    {
+                                      text: 'OK',
+                                      onPress: () => {
+                                        router.push(`/profesional/${paciente}/plan`);
+                                      },
+                                    },
+                              ])})      
           };
         
             //LLAMADA A LA API
             //EL AUTOR DEBE SER EL ID DEL USUARIO (OBTENER POR USEAUTH())
             //LA FECHA SE DEBERÍA CREAR AUTOMÁTICAMENTE EN EL BACKEND
         }
-        Alert.alert(
-            'Éxito',
-            'Objetivo guardado correctamente',
-            [
-              {
-                text: 'OK',
-                onPress: () => {
-                  router.push(`/profesional/${paciente}/plan`);
-                },
-              },
-        ])
         //ACÁ DEBERÍAMOS PONER UN CASO EN EL QUE NO SE GUARDA EXITOSAMENTE
     }
 

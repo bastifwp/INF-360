@@ -55,7 +55,7 @@ const Plan = () => {
     const api = createApi(authToken, refreshToken, setAuthToken);
 
     api
-        .get('/objetivos/'+id+'/')
+        .get('/objetivos/'+id+'/',{timeout: 5000})
         .then(res => setObjetivos(res.data))
         .catch(err => console.log(err));
   },[authToken, refreshToken]); // 👈 se ejecuta cada vez que cambien
@@ -67,7 +67,7 @@ const Plan = () => {
   const api = createApi(authToken, refreshToken, setAuthToken);
 
   api
-    .get('/objetivos/'+id+'/')
+    .get('/objetivos/'+id+'/', {timeout: 5000})
     .then(res => setObjetivos(res.data))
     .catch(err => {console.log(err); Alert.alert("Error", "Error al cargar plan de trabajo")});
   };

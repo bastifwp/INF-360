@@ -46,7 +46,7 @@ export default function Registro() {
       //Para acceder desde el pc la ruta es es: http://localhost:8000/registro (endpoint de la api de bakcend)
       //Para acceder desde el celular la ruta es: http://<ipv4 del pc>:8000/registro 
       //Eso pasa porque el celular no hace la conuslta al localhost (a el mismo) sino que lo hace al pc
-      const response = await axios.post('http://localhost:8000/registro/', {
+      const response = await axios.post('http://192.168.1.164:8000/registro/', {
         
         //En el backend hay un "serializer" por cada consulta
         //El serializer del backend te dice la estructura del json a mandar

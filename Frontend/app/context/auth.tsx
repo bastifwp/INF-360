@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
       //Para acceder desde el celular la ruta es: http://<ipv4 del pc>:8000/token 
       //Eso pasa porque el celular no hace la conuslta al localhost (a el mismo) sino que lo hace al pc
     try{
-      const response = await axios.post('http://localhost:8000/token/', {
+      const response = await axios.post('http://192.168.1.164:8000/token/', {
         username: email,
         password: password
       });
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
   const createApi = (authToken, refreshToken, setAuthToken) => {
 
       const api = axios.create({
-      baseURL: 'http://localhost:8000',
+      baseURL: 'http://192.168.1.164:8000',
       });
 
       // Agrega token a cada solicitud
@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
 
           if (refreshToken) {
               try {
-              const res = await axios.post('http://localhost:8000/token/refresh/', {
+              const res = await axios.post('http://192.168.1.164:8000/token/refresh/', {
                   refresh: refreshToken,
               });
 

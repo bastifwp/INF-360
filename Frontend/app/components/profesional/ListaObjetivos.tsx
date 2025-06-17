@@ -39,7 +39,7 @@ const ObjetivoItem = ({ objetivo, onChange }) => {
         const api = createApi(authToken, refreshToken, setAuthToken);
 
         api
-            .delete('/objetivos/detalle/'+objetivo.id+'/')
+            .delete('/objetivos/detalle/'+objetivo.id+'/',{timeout:5000})
             .then(res => {console.log(res.status);
                           onChange()})
             .catch(err => {
