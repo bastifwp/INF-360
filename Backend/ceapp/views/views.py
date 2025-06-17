@@ -362,6 +362,7 @@ class BitacoraPorPlanView(APIView):
         serializer = BitacoraEntradaSerializer(entradas, many=True)
         return Response(serializer.data)
 
+    #Este es el que tiene el problema
     def post(self, request, id_plan):
         user = request.user
 
@@ -380,19 +381,16 @@ class BitacoraPorPlanView(APIView):
         data = request.data.copy()
         data['plan_trabajo'] = id_plan
         data['fecha'] = timezone.now().date()
-
+        
         serializer = BitacoraEntradaSerializer(data=data)
+        
+
         if serializer.is_valid():
+            
             entrada = serializer.save(autor=user)
 
-            # Asociar objetivos si vienen
-            selected_obj = serializer.selected_obj #request.data.get('selected_obj', [])
-            for obj_id in selected_obj:
-                try:
-                    obj = Objetivo.objects.get(id=obj_id)
-                    BitacoraEntradaObjetivo.objects.create(bitacora_entrada=entrada, objetivo=obj)
-                except Objetivo.DoesNotExist:
-                    continue
+            new_data = serializer.data
+            new_data['selected_obj'] = data['selected_obj']
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(new_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

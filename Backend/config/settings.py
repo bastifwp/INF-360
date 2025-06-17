@@ -58,7 +58,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # el token principal dura 5 min
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # el token principal dura 5 min
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # el token de refresco dura 1 día
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,

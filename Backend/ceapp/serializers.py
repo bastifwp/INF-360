@@ -117,20 +117,39 @@ class BitacoraEntradaSerializer(serializers.ModelSerializer):
         child=serializers.IntegerField(), write_only=True, required=False
     )
 
+    objetivos = Objetivo
+
     class Meta:
         model = BitacoraEntrada
-        fields = ['id', 'fecha', 'titulo', 'comentarios', 'plan_trabajo', 'autor', 'objetivos', 'selected_obj']
+        fields = ['id', 'fecha', 'titulo', 'comentarios', 'plan_trabajo', 'autor', 'selected_obj']
+    
 
-    def get_objetivos(self, obj):
-        objetivos_relacionados = obj.objetivos_relacionados.select_related('objetivo')
-        objetivos = [rel.objetivo for rel in objetivos_relacionados]
-        return ObjetivoLiteSerializer(objetivos, many=True).data
+
+    #def get_objetivos(self, obj):
+    #    objetivos_relacionados = obj.objetivos_relacionados.select_related('objetivo')
+    #    objetivos = [rel.objetivo for rel in objetivos_relacionados]
+    #    return ObjetivoLiteSerializer(objetivos, many=True).data
         
     
-    # def create(self, validated_data):
-    #     validated_data.pop('selected_obj', None)  # Solo la sacamos si viene
-    #     return BitacoraEntrada.objects.create(**validated_data)
+    def create(self, validated_data):
+        objetivos_ids = validated_data.pop('selected_obj', None)  # Solo la sacamos si viene
+        bitacora = BitacoraEntrada.objects.create(**validated_data)
+
+        # Crear manualmente las relaciones en la tabla intermedia
+        for objetivo_id in objetivos_ids:
+
+            #Verificamos si existe el objetivo
+            if Objetivo.objects.filter(id=objetivo_id).exists():
+                BitacoraEntradaObjetivo.objects.create(
+                    bitacora_entrada=bitacora,
+                    objetivo_id=objetivo_id
+                )
+            else:
+                raise serializers.ValidationError("Objetivo no encontrado")
+
+        return bitacora
     
+
 
 class ProfesionalPlanTrabajoSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='plan_trabajo.id')
