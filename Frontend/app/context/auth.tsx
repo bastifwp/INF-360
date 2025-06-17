@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
 
     if (delay > 0) {
       const timeout = setTimeout(() => {
-        axios.post('http://localhost:8000/token/refresh/', {
+        axios.post('http://192.168.157.38:8000/token/refresh/', {
           refresh: refreshToken,
         })
         .then(res => {
@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
   // LOGIN
   const login = async (email: string, password: string): Promise<void> => {
     try {
-      const response = await axios.post('http://localhost:8000/token/', {
+      const response = await axios.post('http://192.168.157.38:8000/token/', {
         username: email,
         password: password
       }, {timeout: 5000});
@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
   // API CON INTERCEPTORES
   const createApi = (authToken, refreshToken, setAuthToken) => {
     const api = axios.create({
-      baseURL: 'http://localhost:8000',
+      baseURL: 'http://192.168.157.38:8000',
     });
 
     api.interceptors.request.use(async config => {
@@ -130,7 +130,7 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
 
           if (refreshToken) {
             try {
-              const res = await axios.post('http://localhost:8000/token/refresh/', {
+              const res = await axios.post('http://192.168.157.38:8000/token/refresh/', {
                 refresh: refreshToken,
               });
 

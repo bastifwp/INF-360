@@ -29,10 +29,10 @@ DEBUG = True
 
 
 #TO ALLOW MOBILE ACCES: 
-#ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'your-ip']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.157.38']
 
 #To only web acces:
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'ceapp.CustomUser'
 

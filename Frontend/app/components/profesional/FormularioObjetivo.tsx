@@ -361,7 +361,7 @@ const FormularioObjetivo = () => {
                     placeholder="Descripción del objetivo"
                     multiline
                     numberOfLines={4}
-                    className="border border-gray-400 rounded-xl px-4 py-10 mb-4 text-start"
+                    className="border border-gray-400 rounded-xl px-4 mb-1 text-start"
                 />
 
                 <TouchableOpacity

@@ -96,7 +96,27 @@ const ObjetivoItem = ({ objetivo, onChange }) => {
 
       {expandido && (
         <>
-          <Text style={{ marginTop: 8, color: '#333' }}>{objetivo.descripcion}</Text>
+          <View style={{ padding: 8, marginVertical: 8, borderRadius: 8}}>
+            <Text className='text-black'>{objetivo.descripcion}</Text>
+          </View>
+
+          <Text style={{ marginLeft: 8, fontWeight: 'bold' }}>Categoría:</Text>
+
+          <View
+            style={{
+              backgroundColor: categoriaColores[objetivo.categoria] || categoriaColores.default,
+              marginTop: 8,
+              paddingVertical: 10,
+              paddingHorizontal: 20,
+              borderRadius: 30,
+              marginVertical: 4,
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>
+              {objetivo.categoria}
+            </Text>
+          </View>
 
           {objetivo.autor_modificacion && objetivo.fecha_modificacion && (
             <Text style={{ color: '#777', fontSize: 12, marginTop: 4 }}>

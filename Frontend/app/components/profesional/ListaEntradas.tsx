@@ -63,7 +63,7 @@ const EntradaItem = ({ entrada }) => {
           <View style={{ padding: 8, marginVertical: 8, borderRadius: 8, backgroundColor: "#ffffff"}}>
             <Text className='text-black'>{entrada.comentarios}</Text>
           </View>
-          <Text style={{ marginLeft: 8, fontWeight: 'bold' }}>Objetivos trabajados</Text>
+          <Text style={{ marginLeft: 8, fontWeight: 'bold' }}>Objetivos trabajados:</Text>
           <View style={{ marginTop: 8 }}>
             {entrada.selected_obj?.map((item, index) => (
               <View
