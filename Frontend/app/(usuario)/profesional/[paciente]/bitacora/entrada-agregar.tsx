@@ -42,14 +42,20 @@ const EntradaAgregar = () => {
 
 
   //Hacemos la consulta para tener todos los objetivos de la base de datos
-  if (!authToken || !refreshToken) return;
 
-  const api = createApi(authToken, refreshToken, setAuthToken);
+  useEffect(() => {
+    
+      if (!authToken || !refreshToken) return;
+  
+      const api = createApi(authToken, refreshToken, setAuthToken);
 
-  api
-      .get('/objetivos/'+paciente_id+'/')
-      .then(res => setObjetivos(res.data))
-      .catch(err => console.log(err));
+      api
+          .get('/objetivos/'+paciente_id+'/')
+          .then(res => setObjetivos(res.data))
+          .catch(err => console.log(err));
+  },[authToken, refreshToken]); // 👈 se ejecuta cada vez que cambien
+
+  
 
     
   const datosIniciales = useRef({
