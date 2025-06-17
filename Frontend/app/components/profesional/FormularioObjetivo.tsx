@@ -311,6 +311,7 @@ const FormularioObjetivo = () => {
                     onChangeText={setTitulo}
                     placeholder="Título del objetivo"
                     className="border border-gray-400 rounded-xl px-4 py-3 mb-4"
+                    maxLength={255}
                 />
 
                 {/*INPUT: CATEGORÍA*/}

@@ -182,6 +182,7 @@ const EntradaAgregar = () => {
           onChangeText={setTitulo}
           placeholder="Título"
           className="border border-gray-400 rounded-xl px-4 py-3 mb-4"
+          maxLength={255}
         />
 
         <Text className="font-semibold mb-2">Objetivo</Text>
@@ -199,6 +200,7 @@ const EntradaAgregar = () => {
           multiline
           numberOfLines={4}
           className="border border-gray-400 rounded-xl px-4 py-10 mb-8 text-start"
+          maxLength={4000}
         />
 
         <TouchableOpacity

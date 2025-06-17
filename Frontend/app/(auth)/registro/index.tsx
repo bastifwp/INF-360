@@ -18,8 +18,6 @@ import { useAuth } from "../../context/auth"; // Ajusta la ruta según tu estruc
 import axios from 'axios';
 
 
-
-
 export default function Registro() {
   const router = useRouter();
   const { login } = useAuth(); // 👈 ocupamos la función login del contexto
@@ -159,6 +157,7 @@ export default function Registro() {
             autoCapitalize="words"
             value={nombre}
             onChangeText={setNombre}
+            maxLength={100}
           />
           <TextInput
             className="w-full bg-white p-4 rounded-md mb-4 border border-gray-300"
@@ -167,6 +166,7 @@ export default function Registro() {
             autoCapitalize="none"
             value={correo}
             onChangeText={setCorreo}
+            maxLength={100}
           />
           <TextInput
             className="w-full bg-white p-4 rounded-md mb-6 border border-gray-300"
@@ -174,6 +174,7 @@ export default function Registro() {
             secureTextEntry
             value={contrasena}
             onChangeText={setContrasena}
+            maxLength={100}
           />
 
           {rol === "profesional" && (
@@ -185,6 +186,7 @@ export default function Registro() {
                 autoCapitalize="words"
                 value={cargo}
                 onChangeText={setCargo}
+                maxLength={100}
               />
               <TextInput
                 className="w-full bg-white p-4 rounded-md mb-6 border border-gray-300"
@@ -193,6 +195,7 @@ export default function Registro() {
                 autoCapitalize="words"
                 value={institucion}
                 onChangeText={setInstitucion}
+                maxLength={100}
               />
             </>
           )}

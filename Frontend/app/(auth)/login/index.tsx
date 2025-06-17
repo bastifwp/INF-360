@@ -91,6 +91,7 @@ export default function asyLoginScreen() {
         autoCapitalize="none"
         value={email}
         onChangeText={setEmail}
+        maxLength={100}
       />
 
       <TextInput
@@ -99,6 +100,7 @@ export default function asyLoginScreen() {
         secureTextEntry
         value={password}
         onChangeText={setPassword}
+        maxLength={100}
       />
 
       <TouchableOpacity
