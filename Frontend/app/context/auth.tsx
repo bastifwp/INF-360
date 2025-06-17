@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
       const response = await axios.post('http://localhost:8000/token/', {
         username: email,
         password: password
-      });
+      }, {timeout: 5000});
 
       console.log("Token_obtained");
       console.log(response.data);

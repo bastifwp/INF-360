@@ -56,7 +56,7 @@ export default function Registro() {
         role: rol,
         cargo: cargo,
         institucion: institucion,
-      });
+      }, {timeout: 5000});
 
       console.log("Successfull register");
       console.log(response.data);
