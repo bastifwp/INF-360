@@ -219,13 +219,13 @@ const EntradaAgregar = () => {
           placeholder="Comentarios"
           multiline
           numberOfLines={4}
-          className="border border-gray-400 rounded-xl px-4 py-10 mb-8 text-start"
+          className="border border-gray-400 rounded-xl px-4 mb-1 text-start"
           maxLength={4000}
         />
 
         <TouchableOpacity
           onPress={handleGuardar}
-          className="bg-secondary rounded-xl py-3 mx-4 mb-8 items-center"
+          className="bg-secondary rounded-xl py-3 mx-4 mt-4 mb-8 items-center"
           style={{ backgroundColor: '#F26052' }}
         >
           <Text className="text-white font-bold text-lg">Guardar</Text>
