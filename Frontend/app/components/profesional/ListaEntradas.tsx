@@ -65,7 +65,7 @@ const EntradaItem = ({ entrada }) => {
           </View>
           <Text style={{ marginLeft: 8, fontWeight: 'bold' }}>Objetivos trabajados</Text>
           <View style={{ marginTop: 8 }}>
-            {entrada.selectedObj?.map((item, index) => (
+            {entrada.selected_obj?.map((item, index) => (
               <View
                 key={index}
                 style={{

@@ -146,22 +146,37 @@ const EntradaAgregar = () => {
                                               paciente,
                                               selected_obj
           })
-          .then(res => console.log(res.data))
-          .catch(err => console.log(err))      
+          .then(res => {console.log(res.data);
+                        Alert.alert(
+                        'Éxito',
+                        'Entrada guardada correctamente',
+                        [
+                          {
+                            text: 'OK',
+                            onPress: () => {
+                              // Ejemplo: ir a la lista de entradas
+                              router.push(`/profesional/${paciente}/bitacora`);
+                            },
+                          },
+                        ])                 
+          })
+          .catch(err => {console.log(err)
+                         Alert.alert(
+                        'Error',
+                        'Entrada no pudo guardarse',
+                        [
+                          {
+                            text: 'OK',
+                            onPress: () => {
+                              // Ejemplo: ir a la lista de entradas
+                              router.push(`/profesional/${paciente}/bitacora`);
+                            },
+                          },
+                        ])
+          })      
     };
 
-    Alert.alert(
-    'Éxito',
-    'Entrada guardada correctamente',
-    [
-      {
-        text: 'OK',
-        onPress: () => {
-          // Ejemplo: ir a la lista de entradas
-          router.push(`/profesional/${paciente}/bitacora`);
-        },
-      },
-    ])
+    
     //ACÁ DEBERÍAMOS PONER UN CASO EN EL QUE NO SE GUARDA EXITOSAMENTE
   };
 

@@ -360,7 +360,26 @@ class BitacoraPorPlanView(APIView):
 
         entradas = BitacoraEntrada.objects.filter(plan_trabajo__id=id_plan)
         serializer = BitacoraEntradaSerializer(entradas, many=True)
-        return Response(serializer.data)
+    
+
+        new_data = serializer.data
+        #Buscamos los selected object
+        #Por cada entrada debemos agregarle la lista de los objetivos -> buscarlo en tabla
+        for entrada in new_data:
+            objetivos_entradas = BitacoraEntradaObjetivo.objects.filter(bitacora_entrada=entrada['id'])
+            
+            #Las señoritas del frontend quieren un diccionario asi q hay q hacerlo
+            new_list = []
+            for objetivo_entrada in objetivos_entradas:        
+                new_list.append({'id': objetivo_entrada.objetivo.id, 'categoria':objetivo_entrada.objetivo.categoria, 'titulo': objetivo_entrada.objetivo.titulo})
+                
+            entrada['selected_obj'] = new_list
+
+            
+
+
+        return Response(new_data)
+        
 
     #Este es el que tiene el problema
     def post(self, request, id_plan):
@@ -389,6 +408,7 @@ class BitacoraPorPlanView(APIView):
             
             entrada = serializer.save(autor=user)
 
+            
             new_data = serializer.data
             new_data['selected_obj'] = data['selected_obj']
 
