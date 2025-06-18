@@ -358,7 +358,7 @@ class BitacoraPorPlanView(APIView):
         if not es_cuidador and not es_profesional:
             return Response({'detail': 'No autorizado para ver esta bitácora'}, status=status.HTTP_403_FORBIDDEN)
 
-        entradas = BitacoraEntrada.objects.filter(plan_trabajo__id=id_plan)
+        entradas = BitacoraEntrada.objects.filter(plan_trabajo__id=id_plan).order_by('-fecha')
         serializer = BitacoraEntradaSerializer(entradas, many=True)
     
 

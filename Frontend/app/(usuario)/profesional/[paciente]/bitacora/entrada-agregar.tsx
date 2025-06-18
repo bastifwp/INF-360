@@ -150,7 +150,7 @@ const EntradaAgregar = () => {
                                               comentarios,
                                               paciente,
                                               selected_obj
-          }, {timeout: 5000})
+          }, {timeout: 2000})
           .then(res => {console.log(res.data);
                         Alert.alert(
                         'Éxito',

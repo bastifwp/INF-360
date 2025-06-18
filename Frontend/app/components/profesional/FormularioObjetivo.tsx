@@ -285,7 +285,7 @@ const FormularioObjetivo = () => {
             const api = createApi(authToken, refreshToken, setAuthToken);
 
             api
-                .post('/objetivos/'+paciente_id+'/', {titulo: titulo, descripcion: descripcion, categoria:  categoria}, {timeout: 5000})
+                .post('/objetivos/'+paciente_id+'/', {titulo: titulo, descripcion: descripcion, categoria:  categoria}, {timeout: 2000})
                 .then(res => {console.log(res.data);
                               Alert.alert(
                                   'Éxito',

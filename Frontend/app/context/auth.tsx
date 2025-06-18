@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
 
-  // 🔄 REFRESCO AUTOMÁTICO DEL TOKEN
+  //  REFRESCO AUTOMÁTICO DEL TOKEN
   useEffect(() => {
     if (!authToken || !refreshToken) return;
 
@@ -57,16 +57,16 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
 
     if (delay > 0) {
       const timeout = setTimeout(() => {
-        axios.post('http://localhost:8000/token/refresh/', {
+        axios.post('http://192.168.185.65:8000/token/refresh/', {
           refresh: refreshToken,
         })
         .then(res => {
           const newAccess = res.data.access;
           setAuthToken(newAccess);
-          console.log("🔄 Token actualizado automáticamente");
+          console.log("Token actualizado automáticamente");
         })
         .catch(err => {
-          console.error("⚠️ Error al refrescar token automáticamente", err);
+          console.error("Error al refrescar token automáticamente", err);
           logout();
         });
       }, delay);
@@ -132,7 +132,8 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
             try {
               const res = await axios.post('http://localhost:8000/token/refresh/', {
                 refresh: refreshToken,
-              });
+              },
+            {timeout: 2000});
 
               const newAccess = res.data.access;
               setAuthToken(newAccess);
@@ -140,6 +141,7 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
               originalRequest.headers['Authorization'] = `Bearer ${newAccess}`;
               return api(originalRequest);
             } catch (e) {
+              throw e;
               console.error("No se pudo refrescar el token", e);
             }
           }

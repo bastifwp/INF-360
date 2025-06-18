@@ -5,6 +5,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { useAuth } from '@/app/context/auth';
 import ListaObjetivos from "../../../../components/profesional/ListaObjetivos"
 import ListaMetas from '@/app/components/profesional/ListaMetas';
+import ListaActividades from '@/app/components/profesional/ListaActividades';
 
 /*
 const objetivos = [
@@ -33,7 +34,19 @@ const metas = [{
     color: "#d1ae00"
 }];
 
-const actividades = []
+const actividades = [{
+    id: "1",
+    titulo: "Juego de memoria",
+    descripcion: "Juego de memoria con cartas que contienen figuras",
+    duración: "#306e21"
+},
+{
+    id: "2",
+    titulo: "Lectura guiada",
+    descripcion: "Tiempo de lectura con ayuda de un profesional",
+    duración: "#306e21"
+}];
+
 
 const Plan = () => {
 
@@ -153,7 +166,7 @@ const Plan = () => {
                 </Text>
               </View>
             ) : (
-              <ListaObjetivos objetivos={actividades} onChange={fetchObjetivos}/>
+              <ListaActividades actividades={actividades} onChange={fetchObjetivos}/>
             )}
           </>
         )}
