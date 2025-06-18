@@ -99,7 +99,7 @@ return (
       }}
       resizeMode="contain"
     />
-    <Text className="text-3xl font-bold text-white">CEAPP</Text>
+    <Text className="text-3xl font-bold text-white">CEApp</Text>
   </View>
 
   {/* 👉 Contenedor del formulario */}

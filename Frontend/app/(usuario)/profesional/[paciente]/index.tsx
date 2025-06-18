@@ -17,7 +17,7 @@ export default function Inicio() {
     {
       icon: icons.bitacora,
       label: "Bitácora",
-      description: "Registro diario de observaciones",
+      description: "Registro de sesiones terapéuticas",
     },
     {
       icon: icons.chat,
