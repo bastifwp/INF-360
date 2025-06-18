@@ -9,14 +9,15 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Image,
 } from "react-native";
 import RadioButton from "../../components/RadioButton";
 import { useAuth } from "../../context/auth"; // Ajusta la ruta según tu estructura
-
+import { Ionicons } from '@expo/vector-icons'; 
+import { images } from "@/constants/images";
 
 //Para hacer consultas a apis
 import axios from 'axios';
-
 
 export default function Registro() {
   const router = useRouter();
@@ -61,13 +62,13 @@ export default function Registro() {
       console.log("Successfull register");
       console.log(response.data);
       
-      Alert.alert('Success', 'You have registered successfully!');
+      Alert.alert('Éxito', '¡Te has registrado exitosamente!');
 
       //Como el registro fue un éxito entonces ahora intentamos logearnos
       try{
         const result = login(correo, contrasena);
-        console.log("Succesfull login");
-        Alert.alert("Succesfull login");
+        console.log("Inicio de sesión exitoso");
+        Alert.alert("Inicio de sesión exitoso");
 
         //Redireccionamos al index
         router.replace("/");
@@ -101,14 +102,14 @@ export default function Registro() {
       if(axios.isAxiosError(error) && error.response?.status === 400){
         const errores = error.response.data;
 
-        Alert.alert("Error al registrarse");
-        console.log("Error al registrarse");
+        Alert.alert("Error al registrarse. Intenta nuevamente.");
+        console.log("Error al registrarse. Intenta nuevamente.");
       }
 
       //EL error no es de axios
       else{
-        Alert.alert("Error desconocido al intentar registrarse");
-        console.log("Error desconocido al intentar registrarse");
+        Alert.alert("Error desconocido al intentar registrarse. Intenta nuevamente.");
+        console.log("Error desconocido al intentar registrarse. Intenta nuevamente.");
       }
     };
     
@@ -128,83 +129,134 @@ export default function Registro() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1"
+      className="flex-1 bg-primary"
     >
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1, justifyContent: "center", paddingHorizontal: 24 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          paddingHorizontal: 24,
+          paddingVertical: 20,
+        }}
         keyboardShouldPersistTaps="handled"
       >
-        <View className="justify-center items-center bg-gray-100 px-6">
-          <Text className="text-2xl font-bold mb-8">Registro</Text>
+        {/* Botón flecha atrás usando Ionicons */}
+        <TouchableOpacity
+          onPress={() => router.push("/login")} // o router.back()
+          style={{ position: "absolute", top: 10, left: 10, zIndex: 10 }}
+          accessible={true}
+          accessibilityLabel="Volver al inicio de sesión"
+        >
+          <Ionicons name="arrow-back" size={28} color="white" />
+        </TouchableOpacity>
 
-          <RadioButton
-            label="Soy cuidador"
-            value="cuidador"
-            selected={rol === "cuidador"}
-            onSelect={setRol}
-          />
-          <RadioButton
-            label="Soy profesional"
-            value="profesional"
-            selected={rol === "profesional"}
-            onSelect={setRol}
-          />
+        {/* Logo + Nombre */}
+        <View className="flex-row items-center justify-center mb-10">
+          <Image
+                source={images.logo}
+                style={{
+                  width: Platform.OS === 'web' ? 48 : 80,  // 48px para web, 80px para móvil
+                  height: Platform.OS === 'web' ? 48 : 80,
+                  marginRight: 16,
+                }}
+                resizeMode="contain"
+              />
+          <Text className="text-3xl font-bold text-white">CEAPP</Text>
+        </View>
 
-          <TextInput
-            className="w-full bg-white p-4 rounded-md mb-4 border border-gray-300"
-            placeholder="Nombre"
-            keyboardType="default"
-            autoCapitalize="words"
-            value={nombre}
-            onChangeText={setNombre}
-            maxLength={100}
-          />
-          <TextInput
-            className="w-full bg-white p-4 rounded-md mb-4 border border-gray-300"
-            placeholder="Email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={correo}
-            onChangeText={setCorreo}
-            maxLength={100}
-          />
-          <TextInput
-            className="w-full bg-white p-4 rounded-md mb-6 border border-gray-300"
-            placeholder="Contraseña"
-            secureTextEntry
-            value={contrasena}
-            onChangeText={setContrasena}
-            maxLength={100}
-          />
+        {/* Contenedor formulario */}
+        <View className="bg-white p-6 py-10 rounded-2xl shadow-lg">
+          {/* Título */}
+          <Text className="text-3xl font-bold text-primary mb-6 text-center">
+            Registro
+          </Text>
+
+          {/* Selector Rol */}
+          <View className="flex-row justify-around mb-2">
+            <RadioButton
+              label="Soy cuidador"
+              value="cuidador"
+              selected={rol === "cuidador"}
+              onSelect={setRol}
+            />
+            <RadioButton
+              label="Soy profesional"
+              value="profesional"
+              selected={rol === "profesional"}
+              onSelect={setRol}
+            />
+          </View>
+
+          {/* Campos formulario */}
+
+          <View className="w-full mb-4">
+            <Text className="text-primary mb-2 font-semibold">Nombre</Text>
+            <TextInput
+              className="w-full bg-gray-50 px-4 py-3 rounded-lg border border-primary"
+              placeholder="Nombre"
+              autoCapitalize="words"
+              value={nombre}
+              onChangeText={setNombre}
+            />
+          </View>
+
+          <View className="w-full mb-4">
+            <Text className="text-primary mb-2 font-semibold">Email</Text>
+            <TextInput
+              className="w-full bg-gray-50 px-4 py-3 rounded-lg border border-primary"
+              placeholder="Email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={correo}
+              onChangeText={setCorreo}
+            />
+          </View>
+
+          <View className="w-full mb-4">
+            <Text className="text-primary mb-2 font-semibold">Contraseña</Text>
+            <TextInput
+              className="w-full bg-gray-50 px-4 py-3 rounded-lg border border-primary"
+              placeholder="Contraseña"
+              secureTextEntry
+              value={contrasena}
+              onChangeText={setContrasena}
+            />
+          </View>
 
           {rol === "profesional" && (
             <>
-              <TextInput
-                className="w-full bg-white p-4 rounded-md mb-6 border border-gray-300"
-                placeholder="Cargo"
-                keyboardType="default"
-                autoCapitalize="words"
-                value={cargo}
-                onChangeText={setCargo}
-                maxLength={100}
-              />
-              <TextInput
-                className="w-full bg-white p-4 rounded-md mb-6 border border-gray-300"
-                placeholder="Institución"
-                keyboardType="default"
-                autoCapitalize="words"
-                value={institucion}
-                onChangeText={setInstitucion}
-                maxLength={100}
-              />
+              <View className="w-full mb-4">
+                <Text className="text-primary mb-2 font-semibold">Cargo</Text>
+                <TextInput
+                  className="w-full bg-gray-50 px-4 py-3 rounded-lg border border-primary"
+                  placeholder="Cargo"
+                  autoCapitalize="words"
+                  value={cargo}
+                  onChangeText={setCargo}
+                />
+              </View>
+
+              <View className="w-full mb-4">
+                <Text className="text-primary mb-2 font-semibold">Institución</Text>
+                <TextInput
+                  className="w-full bg-gray-50 px-4 py-3 rounded-lg border border-primary"
+                  placeholder="Institución"
+                  autoCapitalize="words"
+                  value={institucion}
+                  onChangeText={setInstitucion}
+                />
+              </View>
             </>
           )}
 
+          {/* Botón Registrar */}
           <TouchableOpacity
-            className="w-full bg-blue-600 py-4 rounded-md"
+            className="w-full bg-primary py-4 rounded-lg"
             onPress={handleRegistro}
           >
-            <Text className="text-white text-center font-semibold">Registrarme</Text>
+            <Text className="text-white text-center font-semibold text-base">
+              Registrarme
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
