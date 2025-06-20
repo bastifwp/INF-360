@@ -1,11 +1,11 @@
-// components/CustomFooter.tsx
 import React from "react";
-import { View, TouchableOpacity, Image, Text } from "react-native";
-import { useRouter, usePathname } from "expo-router";
 import { icons } from "@/constants/icons";
-import { useLocalSearchParams } from "expo-router";
+import { View, TouchableOpacity, Image, Text } from "react-native";
+import { useRouter, usePathname, useLocalSearchParams } from "expo-router";
 
-const FooterItem = ({ icon, label, isActive, onPress }: any) => (
+import { useDescartarCambios } from "../../context/DescartarCambios";
+
+const FooterItem = ({ icon, label, isActive, onPress }) => (
   <TouchableOpacity
     onPress={onPress}
     style={{
@@ -40,6 +40,7 @@ export default function CustomFooter() {
   const router = useRouter();
   const pathname = usePathname();
   const { paciente } = useLocalSearchParams();
+  const { handleDescartarCambios } = useDescartarCambios();
 
   const items = [
     { route: `/profesional/${paciente}`, icon: icons.inicio, label: "Inicio" },
@@ -68,8 +69,18 @@ export default function CustomFooter() {
           key={item.route}
           icon={item.icon}
           label={item.label}
-          isActive={pathname.startsWith(item.route)}
-          onPress={() => router.push(item.route)}
+          isActive={
+            item.label === "Inicio"
+              ? pathname === item.route
+              : pathname === item.route || pathname.startsWith(item.route + "/")
+          }
+          onPress={() => {
+            if (pathname.includes("/objetivo") && handleDescartarCambios) {
+              handleDescartarCambios(item.route);
+            } else {
+              router.replace(item.route);
+            }
+          }}
         />
       ))}
     </View>

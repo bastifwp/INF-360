@@ -1,57 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, FlatList, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tenerlo instalado
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from "expo-router";
 
-const iconExample = 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'
-const arrowDown = 'https://cdn-icons-png.flaticon.com/512/271/271210.png' // flecha hacia abajo
-const arrowUp = 'https://cdn-icons-png.flaticon.com/512/271/271228.png'   // flecha hacia arriba
+import { useAuth } from '@/app/context/auth';
 
-const objetivos = [
-  {
-    id: '1',
-    nombre: 'Mejorar comunicación',
-    autor: 'Dr. Smith',
-    fecha: '2025-05-01',
-    descripcion: 'Incrementar la interacción social y el lenguaje funcional en el niño.',
-    icono: iconExample,
-  },
-  {
-    id: '2',
-    nombre: 'Reducir ansiedad',
-    autor: 'Dra. López',
-    fecha: '2025-04-15',
-    descripcion: 'Implementar técnicas de relajación para disminuir episodios ansiosos.',
-    icono: iconExample,
-  },
-  {
-    id: '3',
-    nombre: 'Reducir ansiedad',
-    autor: 'Dra. López',
-    fecha: '2025-04-15',
-    descripcion: 'Implementar técnicas de relajación para disminuir episodios ansiosos.',
-    icono: iconExample,
-  },
-  {
-    id: '4',
-    nombre: 'Reducir ansiedad',
-    autor: 'Dra. López',
-    fecha: '2025-04-15',
-    descripcion: 'Implementar técnicas de relajación para disminuir episodios ansiosos.',
-    icono: iconExample,
-  },
-  {
-    id: '5',
-    nombre: 'Reducir ansiedad',
-    autor: 'Dra. López',
-    fecha: '2025-04-15',
-    descripcion: 'Implementar técnicas de relajación para disminuir episodios ansiosos.',
-    icono: iconExample,
-  },
-]
+const categoriaColores = {
+  Comunicación: '#4f83cc',  // Azul
+  Motricidad: '#81c784',    // Verde
+  Cognición: '#f48fb1',     // Rosado
+  Conducta: '#ffb74d',      // Naranjo
+  default: '#b0bec5'        // Gris por defecto
+};
 
-const ObjetivoItem = ({ objetivo }) => {
+const ObjetivoItem = ({ objetivo, onChange }) => {
+
+  const router = useRouter();
   const [expandido, setExpandido] = useState(false);
+  const { paciente } = useLocalSearchParams();
+  const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
+
+  const handleEditar = () => {
+    router.push(`/profesional/${paciente}/plan/objetivo-editar?id=${objetivo.id}`);
+  };
+
+  const handleEliminar = () => {
+    Alert.alert(
+      'Eliminar objetivo',
+      `¿Estás seguro que quieres eliminar "${objetivo.titulo}"?`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Eliminar', onPress: () => {console.log('Eliminado', objetivo.id);
+          {
+            if (!authToken || !refreshToken) return;
+
+            const api = createApi(authToken, refreshToken, setAuthToken);
+
+            api
+                .delete('/objetivos/detalle/'+objetivo.id+'/',{timeout:5000})
+                .then(res => {console.log(res.status);
+                              onChange()})
+                .catch(err => {
+                                if (!err.request){
+                                  // El servidor respondió con un código de error HTTP y no es porque el body de
+                                  // la respuesta esté vacío
+                                  console.log('Error al eliminar objetivo:', err.message);
+                                  //console.log('Error en respuesta:', err.response.status);
+                                  //console.log('Datos:', err.response.data);
+                                }
+                                onChange();
+                              });
+                          
+          } 
+        }, style: 'destructive' },
+      ]
+    );
+           
+  };
+    
+
+  const colorCategoria = categoriaColores[objetivo.categoria] || categoriaColores.default;
 
   return (
     <TouchableOpacity
@@ -64,14 +72,19 @@ const ObjetivoItem = ({ objetivo }) => {
       }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Image
-          source={{ uri: objetivo.icono }}
-          style={{ width: 40, height: 40, marginRight: 12 }}
-        />
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{objetivo.nombre}</Text>
-          <Text style={{ color: '#555' }}>{`Autor: ${objetivo.autor}`}</Text>
-          <Text style={{ color: '#555' }}>{`Fecha: ${objetivo.fecha}`}</Text>
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+          {/* Ícono de categoría con color */}
+          <Ionicons
+            name="ellipse"  // Puedes usar otro icono si quieres
+            size={40}
+            color={colorCategoria}
+            style={{ width: 40, height: 40, marginRight: 12 }}
+          />
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{objetivo.titulo}</Text>
+            <Text style={{ color: '#555' }}>{`Fecha: ${objetivo.fecha_creacion}`}</Text>
+            <Text style={{ color: '#555' }}>{`Autor: ${objetivo.autor_creacion}`}</Text>
+          </View>
         </View>
 
         <Ionicons
@@ -83,22 +96,48 @@ const ObjetivoItem = ({ objetivo }) => {
 
       {expandido && (
         <>
-          <Text style={{ marginTop: 8, color: '#333' }}>{objetivo.descripcion}</Text>
+          <View style={{ padding: 8, marginVertical: 8, borderRadius: 8}}>
+            <Text className='text-black'>{objetivo.descripcion}</Text>
+          </View>
+
+          <Text style={{ marginLeft: 8, fontWeight: 'bold' }}>Categoría:</Text>
+
+          <View
+            style={{
+              backgroundColor: categoriaColores[objetivo.categoria] || categoriaColores.default,
+              marginTop: 8,
+              paddingVertical: 10,
+              paddingHorizontal: 20,
+              borderRadius: 30,
+              marginVertical: 4,
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>
+              {objetivo.categoria}
+            </Text>
+          </View>
+
+          {objetivo.autor_modificacion && objetivo.fecha_modificacion && (
+            <Text style={{ color: '#777', fontSize: 12, marginTop: 4 }}>
+              Última modificación por {objetivo.autor_modificacion} el {objetivo.fecha_modificacion}
+            </Text>
+          )}
         </>
       )}
     </TouchableOpacity>
   );
 };
 
-const ListaObjetivos = () => {
+const ListaObjetivos = ({ objetivos, onChange }) => {
   return (
     <FlatList
       data={objetivos}
       keyExtractor={item => item.id}
-      renderItem={({ item }) => <ObjetivoItem objetivo={item} />}
+      renderItem={({ item }) => <ObjetivoItem objetivo={item} onChange={onChange} />}
       contentContainerStyle={{ paddingBottom: 55 }}
     />
-  )
-}
+  );
+};
 
-export default ListaObjetivos
+export default ListaObjetivos;

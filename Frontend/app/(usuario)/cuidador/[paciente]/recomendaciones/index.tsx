@@ -3,8 +3,8 @@ import { Text, View } from 'react-native'
 
 const Recomendaciones = () => {
   return (
-    <View>
-      <Text>Chat je</Text>
+    <View className="flex-1">
+      <Text className="text-3xl font-bold my-2 align-middle self-center color-primary">Recomendaciones</Text>
     </View>
   )
 }
