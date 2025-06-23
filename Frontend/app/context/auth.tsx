@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
 
     if (delay > 0) {
       const timeout = setTimeout(() => {
-        axios.post('http://192.168.185.65:8000/token/refresh/', {
+        axios.post('http://localhost:8000/token/refresh/', {
           refresh: refreshToken,
         })
         .then(res => {
