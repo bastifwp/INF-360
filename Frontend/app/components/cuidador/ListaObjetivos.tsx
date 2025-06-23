@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, FlatList, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from "expo-router";
+
+import { useAuth } from '@/app/context/auth';
 
 const categoriaColores = {
   Comunicación: '#4f83cc',  // Azul
@@ -11,10 +13,51 @@ const categoriaColores = {
   default: '#b0bec5'        // Gris por defecto
 };
 
-const ObjetivoItem = ({ objetivo }) => {
+const ObjetivoItem = ({ objetivo, onChange }) => {
+
   const router = useRouter();
   const [expandido, setExpandido] = useState(false);
   const { paciente } = useLocalSearchParams();
+  const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
+
+  const handleEditar = () => {
+    router.push(`/profesional/${paciente}/plan/objetivo-editar?id=${objetivo.id}`);
+  };
+
+  const handleEliminar = () => {
+    Alert.alert(
+      'Eliminar objetivo',
+      `¿Estás seguro que quieres eliminar "${objetivo.titulo}"?`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Eliminar', onPress: () => {console.log('Eliminado', objetivo.id);
+          {
+            if (!authToken || !refreshToken) return;
+
+            const api = createApi(authToken, refreshToken, setAuthToken);
+
+            api
+                .delete('/objetivos/detalle/'+objetivo.id+'/',{timeout:5000})
+                .then(res => {console.log(res.status);
+                              onChange()})
+                .catch(err => {
+                                if (!err.request){
+                                  // El servidor respondió con un código de error HTTP y no es porque el body de
+                                  // la respuesta esté vacío
+                                  console.log('Error al eliminar objetivo:', err.message);
+                                  //console.log('Error en respuesta:', err.response.status);
+                                  //console.log('Datos:', err.response.data);
+                                }
+                                onChange();
+                              });
+                          
+          } 
+        }, style: 'destructive' },
+      ]
+    );
+           
+  };
+    
 
   const colorCategoria = categoriaColores[objetivo.categoria] || categoriaColores.default;
 
@@ -53,26 +96,45 @@ const ObjetivoItem = ({ objetivo }) => {
 
       {expandido && (
         <>
-          <Text style={{ marginTop: 8, color: '#333' }}>{objetivo.descripcion}</Text>
+          <View style={{ padding: 8, marginVertical: 8, borderRadius: 8}}>
+            <Text className='text-black'>{objetivo.descripcion}</Text>
+          </View>
+
+          <Text style={{ marginLeft: 8, fontWeight: 'bold' }}>Categoría:</Text>
+
+          <View
+            style={{
+              backgroundColor: categoriaColores[objetivo.categoria] || categoriaColores.default,
+              marginTop: 8,
+              paddingVertical: 10,
+              paddingHorizontal: 20,
+              borderRadius: 30,
+              marginVertical: 4,
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>
+              {objetivo.categoria}
+            </Text>
+          </View>
 
           {objetivo.autor_modificacion && objetivo.fecha_modificacion && (
             <Text style={{ color: '#777', fontSize: 12, marginTop: 4 }}>
               Última modificación por {objetivo.autor_modificacion} el {objetivo.fecha_modificacion}
             </Text>
           )}
-
         </>
       )}
     </TouchableOpacity>
   );
 };
 
-const ListaObjetivos = ({ objetivos }) => {
+const ListaObjetivos = ({ objetivos, onChange }) => {
   return (
     <FlatList
       data={objetivos}
       keyExtractor={item => item.id}
-      renderItem={({ item }) => <ObjetivoItem objetivo={item} />}
+      renderItem={({ item }) => <ObjetivoItem objetivo={item} onChange={onChange} />}
       contentContainerStyle={{ paddingBottom: 55 }}
     />
   );

@@ -29,7 +29,7 @@ DEBUG = True
 
 
 #TO ALLOW MOBILE ACCES: 
-#ALLOWED_HOSTS = ['localhost', '127.0.0.1', '<your_computer_ip>']
+#ALLOWED_HOSTS = ['localhost', '127.0.0.1', "<your_ip>"]
 
 #To only web acces:
 ALLOWED_HOSTS = []
@@ -58,7 +58,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # el token principal dura 5 min
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # el token principal dura 5 min
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # el token de refresco dura 1 día
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,

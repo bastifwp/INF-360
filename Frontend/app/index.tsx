@@ -21,14 +21,14 @@ export default function Index() {
     console.log("[./app/index.tsx] Usuario autenticado:", user);
 
     if (user) {
-      if (user.rol === "profesional") {
+      if (user.role === "profesional") {
         console.log("[./app/index.tsx] Redirigiendo a profesional...");
         router.replace("/profesional");
-      } else if (user.rol === "cuidador") {
+      } else if (user.role === "cuidador") {
         console.log("[./app/index.tsx] Redirigiendo a cuidador...");
         router.replace("/cuidador");
       } else {
-        console.log("[./app/index.tsx] Rol no reconocido:", user.rol);
+        console.log("[./app/index.tsx] Rol no reconocido:", user.role);
         router.replace("/cuidador");
       }
     } else {

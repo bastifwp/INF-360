@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import { useRouter, useLocalSearchParams, useNavigation } from "expo-router"
+import { useAuth } from '@/app/context/auth';
 
 import { DescartarCambiosContext } from '../../context/DescartarCambios';
 
@@ -82,6 +83,7 @@ const FormularioObjetivo = () => {
     const navigation = useNavigation();
     
     const { paciente, id } = useLocalSearchParams();
+    const [paciente_id, encodedNombre] = paciente?.split("-") ?? [null, null];
     //Si es agregar-objetivo, id es undefined
     //Si es editar-objetivo, id es id_objetivo
     
@@ -89,37 +91,75 @@ const FormularioObjetivo = () => {
     const [descripcion, setDescripcion] = useState('');
     const [categoria, setCategoria] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [objetivo, setObjetivo] = useState(null);
+    const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
 
     const datosIniciales = useRef({ titulo: '', descripcion: '', categoria: null});
 
     const modoEdicion = !!id; 
     //Si es agregar-objetivo, modoEdicion es false
     //Si es editar-objetivo, modoEdicion es true
+    useEffect(() => {
+      if (modoEdicion) {
+        if (!authToken || !refreshToken) return;
+        const api = createApi(authToken, refreshToken, setAuthToken);
 
+        api
+          .get('/objetivos/detalle/' + id + '/')
+          .then(res => {
+            const data = res.data;
+            setObjetivo(data);
+            setTitulo(data.titulo);
+            setDescripcion(data.descripcion);
+            setCategoria(data.categoria);
+            datosIniciales.current = {
+              titulo: data.titulo,
+              descripcion: data.descripcion,
+              categoria: data.categoria,
+            };
+            setLoading(false);
+          })
+          .catch(err => {
+            console.log(err);
+            setLoading(false);
+          });
+      } else {
+        datosIniciales.current = {
+          titulo: '',
+          descripcion: '',
+          categoria: null,
+        };
+        setLoading(false);
+      }
+    }, [modoEdicion, id, authToken, refreshToken]);
+    
+    /*
     useEffect(() => {
         if (modoEdicion) {
-            const fetchObjetivo = async () => {
-                const objetivo = {
-                    id,
-                    titulo: 'Mejorar comunicación',
-                    descripcion: 'Incrementar la interacción social y el lenguaje funcional en el niño.',
-                    categoria: 'Comunicación',
-                    autor_creacion: 'Dr. Smith',
-                    fecha_creacion: '2025-05-01',
-                    autor_modificacion: 'Dr. Smith',
-                    fecha_modificacion: '2025-05-01',
-                };
-                setTitulo(objetivo.titulo);
-                setDescripcion(objetivo.descripcion);
-                setCategoria(objetivo.categoria);
-                setLoading(false);
-                datosIniciales.current = {
-                    titulo: objetivo.titulo,
-                    descripcion: objetivo.descripcion,
-                    categoria: objetivo.categoria,
-                };
+
+            //Pedir objetivo id
+            //console.log(id);
+            {
+            if (!authToken || !refreshToken) return;
+            const api = createApi(authToken, refreshToken, setAuthToken);
+            api
+                .get('/objetivos/detalle/'+id+'/')
+                .then(res => setObjetivo(res.data))
+                .catch(err => console.log(err))      
             };
-            fetchObjetivo();
+      
+            console.log(objetivo);
+            
+            setTitulo(objetivo.titulo);
+            setDescripcion(objetivo.descripcion);
+            setCategoria(objetivo.categoria);
+            setLoading(false);
+            datosIniciales.current = {
+                titulo: objetivo.titulo,
+                descripcion: objetivo.descripcion,
+                categoria: objetivo.categoria,
+            }
+         
         } else {
             datosIniciales.current = {
                 titulo: '',
@@ -128,7 +168,7 @@ const FormularioObjetivo = () => {
             };
             setLoading(false);
         }
-    }, [modoEdicion, id]);
+    }, [modoEdicion, id]);*/
 
     const hayCambios = () => {
         return (
@@ -188,32 +228,95 @@ const FormularioObjetivo = () => {
             router.push(path);
         }
     };
-
+    
     const handleGuardar = () => {
+        
         if (!titulo || !descripcion || !categoria) {
             Alert.alert('Error', 'Por favor completa todos los campos');
             return;
         }
         if (modoEdicion) {
-            console.log('Editando objetivo: ', { id, titulo, descripcion, categoria });
+
+            //Se llama para modificar el objetivo
+            console.log('Editando objetivo: ', { paciente_id, titulo, descripcion, categoria });
+            
             //LLAMADA A LA API
+            {
+            if (!authToken || !refreshToken) return;
+
+            const api = createApi(authToken, refreshToken, setAuthToken);
+
+            api
+                .put('/objetivos/detalle/'+id+'/', {titulo: titulo,descripcion: descripcion, categoria:  categoria}, {timeout: 5000})
+                .then(res => {console.log(res.data)
+                              Alert.alert(
+                                  'Éxito',
+                                  'Objetivo guardado correctamente',
+                                  [
+                                    {
+                                      text: 'OK',
+                                      onPress: () => {
+                                        router.push(`/profesional/${paciente}/plan`);
+                                      },
+                                    },
+                              ])
+                })
+                .catch(err => {console.log(err);
+                               Alert.alert(
+                                  'Error',
+                                  'Objetivo no pudo ser editado',
+                                  [
+                                    {
+                                      text: 'OK',
+                                      onPress: () => {
+                                        router.push(`/profesional/${paciente}/plan`);
+                                      },
+                                    },
+                              ])})      
+          };
+
         } else {
-            console.log('Creando objetivo: ', { id, titulo, descripcion, categoria });
+            //SE llama para crear un objetivo
+            console.log('Creando objetivo: ', { paciente_id, titulo, descripcion, categoria });
+          
+          {
+            if (!authToken || !refreshToken) return;
+
+            const api = createApi(authToken, refreshToken, setAuthToken);
+
+            api
+                .post('/objetivos/'+paciente_id+'/', {titulo: titulo, descripcion: descripcion, categoria:  categoria}, {timeout: 2000})
+                .then(res => {console.log(res.data);
+                              Alert.alert(
+                                  'Éxito',
+                                  'Objetivo guardado correctamente',
+                                  [
+                                    {
+                                      text: 'OK',
+                                      onPress: () => {
+                                        router.push(`/profesional/${paciente}/plan`);
+                                      },
+                                    },
+                              ])
+                })
+                .catch(err => {console.log(err); 
+                               Alert.alert(
+                                  'Error',
+                                  'Objetivo no pudo ser creado',
+                                  [
+                                    {
+                                      text: 'OK',
+                                      onPress: () => {
+                                        router.push(`/profesional/${paciente}/plan`);
+                                      },
+                                    },
+                              ])})      
+          };
+        
             //LLAMADA A LA API
             //EL AUTOR DEBE SER EL ID DEL USUARIO (OBTENER POR USEAUTH())
             //LA FECHA SE DEBERÍA CREAR AUTOMÁTICAMENTE EN EL BACKEND
         }
-        Alert.alert(
-            'Éxito',
-            'Objetivo  guardado correctamente',
-            [
-              {
-                text: 'OK',
-                onPress: () => {
-                  router.push(`/profesional/${paciente}/plan`);
-                },
-              },
-        ])
         //ACÁ DEBERÍAMOS PONER UN CASO EN EL QUE NO SE GUARDA EXITOSAMENTE
     }
 
@@ -243,6 +346,7 @@ const FormularioObjetivo = () => {
                     onChangeText={setTitulo}
                     placeholder="Título del objetivo"
                     className="border border-gray-400 rounded-xl px-4 py-3 mb-4"
+                    maxLength={255}
                 />
 
                 {/*INPUT: CATEGORÍA*/}
@@ -257,7 +361,7 @@ const FormularioObjetivo = () => {
                     placeholder="Descripción del objetivo"
                     multiline
                     numberOfLines={4}
-                    className="border border-gray-400 rounded-xl px-4 py-10 mb-4 text-start"
+                    className="border border-gray-400 rounded-xl px-4 mb-1 text-start"
                 />
 
                 <TouchableOpacity

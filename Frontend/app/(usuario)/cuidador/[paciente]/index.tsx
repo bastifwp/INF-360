@@ -1,11 +1,17 @@
-import { Text, View, Image } from "react-native";
+import { Image, Text, View } from "react-native";
 
 import { icons } from "../../../../constants/icons";
 import { useAuth } from "../../../context/auth";
 
 export default function Inicio() {
 
+
+
   const { user } = useAuth();
+
+
+  if (!user) return <Text>User not logged </Text>; //User puede ser null en algunos casos si no se hace handle el react llora
+  
   const primer_nombre = user.nombre.split(" ")[0];
 
   const items = [
