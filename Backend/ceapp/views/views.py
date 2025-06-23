@@ -1,23 +1,35 @@
 from django.shortcuts import render
+from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from ..serializers import (
     RegisterSerializer, PlanTrabajoSerializer, ProfesionalPlanTrabajoSerializer,
-    ObjetivoSerializer, BitacoraEntradaSerializer, BitacoraEntradaObjetivoSerializer
+    ObjetivoSerializer, BitacoraEntradaSerializer, BitacoraEntradaObjetivoSerializer,
+    CustomTokenObtainPairSerializer, ObjetivoPOSTSerializer
 )
 from ..models import (
     PlanTrabajo, ProfesionalPlanTrabajo, Objetivo,
-    BitacoraEntrada, BitacoraEntradaObjetivo
+    BitacoraEntrada, BitacoraEntradaObjetivo, CustomUser
 )
 from ..permissions import EsCuidador, EsProfesional
+
+#Lo importamos para extenderlo y poder ocupar el serializer q definimos
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+from django.shortcuts import get_object_or_404
+
+
+#overwrite al serializer por default al nuestro
+class CustomObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
 
 
 class RegisterView(APIView):
     def post(self, request):
         print(request)
-
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -33,6 +45,7 @@ class PlanTrabajoView(APIView):
         serializer = PlanTrabajoSerializer(objetos, many=True)
         return Response(serializer.data)
 
+
     def post(self, request):
         if not EsCuidador().has_permission(request, self):
             return Response({'detail': 'No autorizado'}, status=status.HTTP_403_FORBIDDEN)
@@ -41,6 +54,7 @@ class PlanTrabajoView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     def put(self, request):
         if not EsCuidador().has_permission(request, self):
@@ -55,6 +69,7 @@ class PlanTrabajoView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     def delete(self, request):
         if not EsCuidador().has_permission(request, self):
@@ -76,14 +91,21 @@ class ObjetivoView(APIView):
         serializer = ObjetivoSerializer(objetos, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
+    '''
+    Este creo que no se ocupa
+    def post(self, request, id_plan):
         if not EsProfesional().has_permission(request, self):
             return Response({'detail': 'No autorizado'}, status=status.HTTP_403_FORBIDDEN)
-        serializer = ObjetivoSerializer(data=request.data)
+        
+        data = request.data.copy()
+        data['plan_trabajo_id'] = id_plan
+  
+        serializer = ObjetivoPOSTSerializer(data=data)
         if serializer.is_valid():
             serializer.save(autor_creacion=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    '''
 
     def put(self, request):
         if not EsProfesional().has_permission(request, self):
@@ -158,7 +180,8 @@ class ProfesionalPlanTrabajoView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        objetos = ProfesionalPlanTrabajo.objects.all()
+        user = request.user
+        objetos = ProfesionalPlanTrabajo.objects.filter(profesional=user)
         serializer = ProfesionalPlanTrabajoSerializer(objetos, many=True)
         return Response(serializer.data)
 
@@ -210,3 +233,184 @@ class BitacoraEntradaObjetivoView(APIView):
             return Response({'detail': 'Eliminado'}, status=status.HTTP_204_NO_CONTENT)
         except BitacoraEntradaObjetivo.DoesNotExist:
             return Response({'detail': 'No encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+class ObjetivosPorPlanView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, id_plan):
+        user = request.user
+
+        # Verifica si el usuario está asociado a ese plan
+        asociado = ProfesionalPlanTrabajo.objects.filter(
+            profesional=user, plan_trabajo__id=id_plan
+        ).exists()
+
+        if not asociado:
+            return Response({'detail': 'No autorizado'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Si está asociado, devuelve los objetivos
+        objetivos = Objetivo.objects.filter(plan_trabajo__id=id_plan)
+        serializer = ObjetivoSerializer(objetivos, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, id_plan):
+        if not EsProfesional().has_permission(request, self):
+            return Response({'detail': 'No autorizado'}, status=status.HTTP_403_FORBIDDEN)
+
+        user = request.user
+
+        # Verificar que el profesional esté asociado al plan
+        asociado = ProfesionalPlanTrabajo.objects.filter(
+            profesional=user, plan_trabajo__id=id_plan
+        ).exists()
+
+        if not asociado:
+            return Response({'detail': 'No autorizado al plan de trabajo'}, status=status.HTTP_403_FORBIDDEN)
+
+        data = request.data.copy()
+        data['plan_trabajo'] = id_plan
+
+        serializer = ObjetivoPOSTSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save(autor_creacion=user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ObjetivoDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, id_obj):
+        user = request.user
+
+        try:
+            objetivo = Objetivo.objects.select_related('plan_trabajo').get(id=id_obj)
+        except Objetivo.DoesNotExist:
+            return Response({'detail': 'No encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Verificar si el usuario es un profesional asociado al plan del objetivo
+        esta_asociado = ProfesionalPlanTrabajo.objects.filter(
+            profesional=user,
+            plan_trabajo=objetivo.plan_trabajo
+        ).exists()
+
+        if not esta_asociado:
+            return Response({'detail': 'No autorizado'}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = ObjetivoSerializer(objetivo)
+        return Response(serializer.data)
+
+    def put(self, request, id_obj):
+        try:
+            obj = Objetivo.objects.get(id=id_obj)
+        except Objetivo.DoesNotExist:
+            return Response({'detail': 'No encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+
+        # Verificar que el profesional esté asociado al plan del objetivo
+        esta_asociado = ProfesionalPlanTrabajo.objects.filter(
+            profesional=user,
+            plan_trabajo=obj.plan_trabajo
+        ).exists()
+
+        if not esta_asociado:
+            return Response({'detail': 'No autorizado para modificar este objetivo'}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = ObjetivoSerializer(obj, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save(autor_modificacion=user)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def delete(self, request, id_obj):
+        try:
+            obj = Objetivo.objects.get(id=id_obj)
+        except Objetivo.DoesNotExist:
+            return Response({'detail': 'No encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        esta_asociado = ProfesionalPlanTrabajo.objects.filter(
+            profesional=user,
+            plan_trabajo=obj.plan_trabajo
+        ).exists()
+
+        if not esta_asociado:
+            return Response({'detail': 'No autorizado para eliminar este objetivo'}, status=status.HTTP_403_FORBIDDEN)
+
+        obj.delete()
+        return Response({'detail': 'Eliminado'}, status=status.HTTP_204_NO_CONTENT)
+    
+class BitacoraPorPlanView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, id_plan):
+        user = request.user
+
+        # Verificar si es cuidador del plan
+        es_cuidador = PlanTrabajo.objects.filter(id=id_plan, cuidador=user).exists()
+
+        # Verificar si es profesional asignado al plan
+        es_profesional = ProfesionalPlanTrabajo.objects.filter(plan_trabajo_id=id_plan, profesional=user).exists()
+
+        if not es_cuidador and not es_profesional:
+            return Response({'detail': 'No autorizado para ver esta bitácora'}, status=status.HTTP_403_FORBIDDEN)
+
+        entradas = BitacoraEntrada.objects.filter(plan_trabajo__id=id_plan).order_by('-fecha')
+        serializer = BitacoraEntradaSerializer(entradas, many=True)
+    
+
+        new_data = serializer.data
+        #Buscamos los selected object
+        #Por cada entrada debemos agregarle la lista de los objetivos -> buscarlo en tabla
+        for entrada in new_data:
+            objetivos_entradas = BitacoraEntradaObjetivo.objects.filter(bitacora_entrada=entrada['id'])
+            
+            #Las señoritas del frontend quieren un diccionario asi q hay q hacerlo
+            new_list = []
+            for objetivo_entrada in objetivos_entradas:        
+                new_list.append({'id': objetivo_entrada.objetivo.id, 'categoria':objetivo_entrada.objetivo.categoria, 'titulo': objetivo_entrada.objetivo.titulo})
+                
+            entrada['selected_obj'] = new_list
+
+            
+
+
+        return Response(new_data)
+        
+
+    #Este es el que tiene el problema
+    def post(self, request, id_plan):
+        user = request.user
+
+        if not EsProfesional().has_permission(request, self):
+            return Response({'detail': 'No autorizado'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Validar que el profesional tenga vínculo con el plan
+        esta_asociado = ProfesionalPlanTrabajo.objects.filter(
+            profesional=user,
+            plan_trabajo_id=id_plan
+        ).exists()
+
+        if not esta_asociado:
+            return Response({'detail': 'No autorizado para modificar este plan'}, status=status.HTTP_403_FORBIDDEN)
+
+        data = request.data.copy()
+        data['plan_trabajo'] = id_plan
+        data['fecha'] = timezone.now().date()
+        
+        serializer = BitacoraEntradaSerializer(data=data)
+        
+
+        if serializer.is_valid():
+            
+            entrada = serializer.save(autor=user)
+
+            
+            new_data = serializer.data
+            new_data['selected_obj'] = data['selected_obj']
+
+            return Response(new_data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

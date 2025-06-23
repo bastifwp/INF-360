@@ -17,7 +17,6 @@ class CustomUser(AbstractUser):
 class PlanTrabajo(models.Model):
     nombre = models.CharField(max_length=255)
     cuidador = models.ForeignKey(User, on_delete=models.CASCADE, related_name='planes_cuidador')
-
     def __str__(self):
         return self.nombre
 
@@ -30,6 +29,7 @@ class ProfesionalPlanTrabajo(models.Model):
 class Objetivo(models.Model):
     titulo = models.CharField(max_length=255)
     descripcion = models.TextField()
+    categoria = models.CharField(max_length=100, blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     autor_creacion = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='objetivos_creados')
     fecha_modificacion = models.DateTimeField(auto_now=True)

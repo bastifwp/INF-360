@@ -1,9 +1,13 @@
-import React, { useState } from 'react'
-import { View, Text, TouchableOpacity } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { View, Text, TouchableOpacity, Alert } from 'react-native'
 import { useRouter, useLocalSearchParams } from "expo-router";
 
-import ListaObjetivos from "../../../components/cuidador/ListaObjetivos"
+import { useAuth } from '@/app/context/auth';
+import ListaObjetivos from "../../../../components/cuidador/ListaObjetivos"
+import ListaMetas from '@/app/components/profesional/ListaMetas';
+import ListaActividades from '@/app/components/profesional/ListaActividades';
 
+/*
 const objetivos = [
   {
     id: '1',
@@ -16,16 +20,71 @@ const objetivos = [
     fecha_modificacion: '2025-05-01',
   }
 ]
+*/
+const metas = [{
+    id: "1",
+    titulo: "Reconoce vocales",
+    estado: "Logrado",
+    color: "#306e21"
+},
+{
+    id: "2",
+    titulo: "Pronuncia la letra R correctamente",
+    estado: "Medianamente Logrado",
+    color: "#d1ae00"
+}];
 
-//También se pueden crear estructuras para que sean listas de estructuras, donde se defina el objetivo asociado
-const metas: string[] = []
-const actividades: string[] = []
+const actividades = [{
+    id: "1",
+    titulo: "Juego de memoria",
+    descripcion: "Juego de memoria con cartas que contienen figuras",
+    duración: "#306e21"
+},
+{
+    id: "2",
+    titulo: "Lectura guiada",
+    descripcion: "Tiempo de lectura con ayuda de un profesional",
+    duración: "#306e21"
+}];
 
 const Plan = () => {
 
   const router = useRouter();
   const { paciente } = useLocalSearchParams();
+
   const [pestanaActiva, setPestanaActiva] = useState<'objetivos' | 'metas' | 'actividades'>('objetivos')
+  const [objetivos, setObjetivos] = useState([]);
+
+  const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
+
+  const [id, encodedNombre] = paciente?.split("-") ?? [null, null];
+
+  
+  useEffect(() => {
+  
+    if (!authToken || !refreshToken) return;
+
+    const api = createApi(authToken, refreshToken, setAuthToken);
+
+    api
+        .get('/objetivos/'+id+'/')
+        .then(res => setObjetivos(res.data))
+        .catch(err => console.log(err));
+  },[authToken, refreshToken]); // 👈 se ejecuta cada vez que cambien
+  
+
+  const fetchObjetivos = () => {
+    if (!authToken || !refreshToken) return;
+
+    const api = createApi(authToken, refreshToken, setAuthToken);
+
+    api
+      .get('/objetivos/'+id+'/')
+      .then(res => setObjetivos(res.data))
+      .catch(err => {console.log(err); Alert.alert("Error", "Error al cargar plan de trabajo")});
+    };
+
+  //fetchObjetivos()
 
   const handleAgregar = () => {
     console.log('[./app/(usuario)/profesional/[paciente]/plan/index.tsx] Agregando objetivo...')
@@ -66,11 +125,11 @@ const Plan = () => {
             {objetivos.length === 0 ? (
               <View className="flex-1 justify-center items-center mt-10">
                 <Text className="text-lg text-gray-500">
-                  Aún no tienes objetivos en tu plan de trabajo.
+                  Aún no tienes objetivos en tu plan de trabajo. Puedes agregar uno apretando el botón ＋.
                 </Text>
               </View>
             ) : (
-              <ListaObjetivos objetivos={objetivos} />
+              <ListaObjetivos objetivos={objetivos} onChange={fetchObjetivos}/>
             )}
           </>
         )}
@@ -85,7 +144,7 @@ const Plan = () => {
                 </Text>
               </View>
             ) : (
-              <ListaObjetivos objetivos={metas} />
+              <ListaMetas metas={metas} onChange={fetchObjetivos}/>
             )}
           </>
         )}
@@ -100,7 +159,7 @@ const Plan = () => {
                 </Text>
               </View>
             ) : (
-              <ListaObjetivos objetivos={actividades} />
+              <ListaActividades actividades={actividades} onChange={fetchObjetivos}/>
             )}
           </>
         )}

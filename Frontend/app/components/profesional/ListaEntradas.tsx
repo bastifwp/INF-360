@@ -1,89 +1,34 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
   FlatList,
   Text,
   View,
   TouchableOpacity,
   Image,
-  Dimensions,
-  findNodeHandle,
-  UIManager
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
+// ✅ ICONO POR DEFECTO
 const iconExample = 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png';
 
-const entradas = [
-  {
-    id: '1',
-    nombre: 'Sesión de Terapia Ocupacional',
-    autor: 'Dr. Smith',
-    fecha: '2025-05-01',
-    descripcion: 'Hoy Juanito Perez estaba muy cansado y no quiso realizar todas las actividades',
-    icono: iconExample,
-    selectedObj: {"1": true, "2": true}
-  },
-  {
-    id: '2',
-    nombre: 'Sesión de Fonoaudiología',
-    autor: 'Dra. López',
-    fecha: '2025-04-15',
-    descripcion: 'Hoy Juanito Perez estaba de buen animo y trabajó de buena manera',
-    icono: iconExample,
-    selectedObj: {"1": true}
-  },
-  // ... más entradas
-];
+// ✅ Colores por categoría
+const categoriaColores = {
+  Comunicación: '#4f83cc',  // Azul
+  Motricidad: '#81c784',    // Verde
+  Cognición: '#f48fb1',     // Rosado
+  Conducta: '#ffb74d',      // Naranjo
+  default: '#b0bec5',       // Gris
+};
 
-const objetivos = [
-  {
-    id: '1',
-    nombre: 'Mejorar comunicación',
-    autor: 'Dr. Smith',
-    fecha: '2025-05-01',
-    descripcion: 'Incrementar la interacción social y el lenguaje funcional en el niño.',
-    icono: iconExample,
-    color: "#2e7512"
-  },
-  {
-    id: '2',
-    nombre: 'Reducir ansiedad',
-    autor: 'Dra. López',
-    fecha: '2025-04-15',
-    descripcion: 'Implementar técnicas de relajación para disminuir episodios ansiosos.',
-    icono: iconExample,
-    color:"#d69e02"
-  },
-  {
-    id: '3',
-    nombre: 'Reducir ansiedad',
-    autor: 'Dra. López',
-    fecha: '2025-04-15',
-    descripcion: 'Implementar técnicas de relajación para disminuir episodios ansiosos.',
-    icono: iconExample,
-  },
-  {
-    id: '4',
-    nombre: 'Reducir ansiedad',
-    autor: 'Dra. López',
-    fecha: '2025-04-15',
-    descripcion: 'Implementar técnicas de relajación para disminuir episodios ansiosos.',
-    icono: iconExample,
-  },
-  {
-    id: '5',
-    nombre: 'Reducir ansiedad',
-    autor: 'Dra. López',
-    fecha: '2025-04-15',
-    descripcion: 'Implementar técnicas de relajación para disminuir episodios ansiosos.',
-    icono: iconExample,
-  },
-]
 
+
+// ✅ Componente de ítem individual
 const EntradaItem = ({ entrada }) => {
   const [expandido, setExpandido] = useState(false);
 
-  
+  const getObjetivoColor = (categoria) => {
+    return categoriaColores[categoria] || categoriaColores.default;
+  };
 
   return (
     <TouchableOpacity
@@ -97,11 +42,11 @@ const EntradaItem = ({ entrada }) => {
     >
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Image
-          source={{ uri: entrada.icono }}
-          style={{ width: 40, height: 40, marginRight: 12 }}
+          source={{ uri: entrada.icono || iconExample }}
+          style={{ width: 40, height: 40, marginRight: 12, borderRadius: 20 }}
         />
         <View style={{ flex: 1 }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{entrada.nombre}</Text>
+          <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{entrada.titulo}</Text>
           <Text style={{ color: '#555' }}>{`Fecha: ${entrada.fecha}`}</Text>
           <Text style={{ color: '#555' }}>{`Autor: ${entrada.autor}`}</Text>
         </View>
@@ -115,33 +60,41 @@ const EntradaItem = ({ entrada }) => {
 
       {expandido && (
         <>
-          <View className='p-2 bg-white my-2 rounded-lg'>
-            <Text className='m-2'>{entrada.descripcion}</Text>
+          <View style={{ padding: 8, marginVertical: 8, borderRadius: 8, backgroundColor: "#ffffff"}}>
+            <Text className='text-black'>{entrada.comentarios}</Text>
           </View>
-          <Text className='m-2 font-bold'>Objetivos Trabajados</Text>
-          <View className='flex-col'>
-            {objetivos.filter(item => entrada.selectedObj[item.id]).map((item) => (
-              <View key={item.id} 
-                    className="flex-1 items-center justify-between py-3 rounded-3xl my-2"
-                    style={{backgroundColor: item.color}}>
-                <Text className='color-white font-bold'>{item.nombre}</Text>
+          <Text style={{ marginLeft: 8, fontWeight: 'bold' }}>Objetivos trabajados:</Text>
+          <View style={{ marginTop: 8 }}>
+            {entrada.selected_obj?.map((item, index) => (
+              <View
+                key={index}
+                style={{
+                  backgroundColor: getObjetivoColor(item.categoria),
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                  borderRadius: 30,
+                  marginVertical: 4,
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>{item.titulo}</Text>
               </View>
             ))}
           </View>
         </>
-        
       )}
     </TouchableOpacity>
   );
 };
 
-const ListaEntradas = () => {
+// ✅ Lista principal
+const ListaEntradas = ({ entradas }) => {
   return (
     <FlatList
       data={entradas}
-      keyExtractor={item => item.id}
+      keyExtractor={(item) => item.id}
       renderItem={({ item }) => <EntradaItem entrada={item} />}
-      contentContainerStyle={{ paddingBottom: 50 }}
+      contentContainerStyle={{ padding: 4, paddingBottom: 50 }}
     />
   );
 };

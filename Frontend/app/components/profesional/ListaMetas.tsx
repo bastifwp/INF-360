@@ -5,6 +5,19 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 
 import { useAuth } from '@/app/context/auth';
 
+const metas = [{
+    id: "1",
+    titulo: "Reconoce vocales",
+    estado: "Logrado",
+    color: "#306e21"
+},
+{
+    id: "2",
+    titulo: "Pronuncia la letra R correctamente",
+    estado: "Medianamente Logrado",
+    color: "#d1ae00"
+}];
+
 const categoriaColores = {
   Comunicación: '#4f83cc',  // Azul
   Motricidad: '#81c784',    // Verde
@@ -13,7 +26,7 @@ const categoriaColores = {
   default: '#b0bec5'        // Gris por defecto
 };
 
-const ObjetivoItem = ({ objetivo, onChange }) => {
+const MetaItem = ({ meta, onChange }) => {
 
   const router = useRouter();
   const [expandido, setExpandido] = useState(false);
@@ -21,49 +34,46 @@ const ObjetivoItem = ({ objetivo, onChange }) => {
   const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
 
   const handleEditar = () => {
-    router.push(`/profesional/${paciente}/plan/objetivo-editar?id=${objetivo.id}`);
+    router.push(`/profesional/${paciente}/plan/objetivo-editar?id=${meta.id}`);
   };
 
   const handleEliminar = () => {
-    Alert.alert(
+    /*Alert.alert(
       'Eliminar objetivo',
       `¿Estás seguro que quieres eliminar "${objetivo.titulo}"?`,
       [
         { text: 'Cancelar', style: 'cancel' },
-        { text: 'Eliminar', onPress: () => {console.log('Eliminado', objetivo.id);
-          {
-            if (!authToken || !refreshToken) return;
-
-            const api = createApi(authToken, refreshToken, setAuthToken);
-
-            api
-                .delete('/objetivos/detalle/'+objetivo.id+'/',{timeout:5000})
-                .then(res => {console.log(res.status);
-                              onChange()})
-                .catch(err => {
-                                if (!err.request){
-                                  // El servidor respondió con un código de error HTTP y no es porque el body de
-                                  // la respuesta esté vacío
-                                  console.log('Error al eliminar objetivo:', err.message);
-                                  //console.log('Error en respuesta:', err.response.status);
-                                  //console.log('Datos:', err.response.data);
-                                }
-                                onChange();
-                              });
-                          
-          } 
-        }, style: 'destructive' },
+        { text: 'Eliminar', onPress: () => console.log('Eliminado', objetivo.id), style: 'destructive' },
       ]
-    );
-           
+    );*/
+      {
+        if (!authToken || !refreshToken) return;
+
+        const api = createApi(authToken, refreshToken, setAuthToken);
+
+        api
+            .delete('/objetivos/detalle/'+meta.id+'/')
+            .then(res => {console.log(res.status);
+                          onChange()})
+            .catch(err => {
+                            if (!err.request){
+                              // El servidor respondió con un código de error HTTP y no es porque el body de
+                              // la respuesta esté vacío
+                              console.log('Error al eliminar objetivo:', err.message);
+                              //console.log('Error en respuesta:', err.response.status);
+                              //console.log('Datos:', err.response.data);
+                            }
+                            onChange();
+                          });
+                          
+      }      
   };
     
 
-  const colorCategoria = categoriaColores[objetivo.categoria] || categoriaColores.default;
+  //const colorCategoria = categoriaColores[objetivo.categoria] || categoriaColores.default;
 
   return (
-    <TouchableOpacity
-      onPress={() => setExpandido(!expandido)}
+    <View
       style={{
         padding: 12,
         backgroundColor: '#f0f4f8',
@@ -75,48 +85,29 @@ const ObjetivoItem = ({ objetivo, onChange }) => {
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           {/* Ícono de categoría con color */}
           <Ionicons
-            name="ellipse"  // Puedes usar otro icono si quieres
+            name="square"  // Puedes usar otro icono si quieres
             size={40}
-            color={colorCategoria}
+            color={meta.color}
             style={{ width: 40, height: 40, marginRight: 12 }}
+            aria-label={meta.estado}
           />
           <View style={{ flex: 1 }}>
-            <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{objetivo.titulo}</Text>
-            <Text style={{ color: '#555' }}>{`Fecha: ${objetivo.fecha_creacion}`}</Text>
-            <Text style={{ color: '#555' }}>{`Autor: ${objetivo.autor_creacion}`}</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{meta.titulo}</Text>
+            <Text style={{ color: '#555' }}>{`Estado: ${meta.estado}`}</Text>
           </View>
         </View>
-
+        {/*
         <Ionicons
           name={expandido ? 'chevron-up' : 'chevron-down'}
           size={20}
           color="#555"
         />
+        */}
       </View>
-
+      {/*
       {expandido && (
         <>
-          <View style={{ padding: 8, marginVertical: 8, borderRadius: 8}}>
-            <Text className='text-black'>{objetivo.descripcion}</Text>
-          </View>
-
-          <Text style={{ marginLeft: 8, fontWeight: 'bold' }}>Categoría:</Text>
-
-          <View
-            style={{
-              backgroundColor: categoriaColores[objetivo.categoria] || categoriaColores.default,
-              marginTop: 8,
-              paddingVertical: 10,
-              paddingHorizontal: 20,
-              borderRadius: 30,
-              marginVertical: 4,
-              alignItems: 'center',
-            }}
-          >
-            <Text style={{ color: 'white', fontWeight: 'bold' }}>
-              {objetivo.categoria}
-            </Text>
-          </View>
+          <Text style={{ marginTop: 8, color: '#333' }}>{objetivo.descripcion}</Text>
 
           {objetivo.autor_modificacion && objetivo.fecha_modificacion && (
             <Text style={{ color: '#777', fontSize: 12, marginTop: 4 }}>
@@ -159,19 +150,20 @@ const ObjetivoItem = ({ objetivo, onChange }) => {
           </View>
         </>
       )}
-    </TouchableOpacity>
+      */}  
+    </View>
   );
 };
 
-const ListaObjetivos = ({ objetivos, onChange }) => {
+const ListaMetas = ({ metas, onChange }) => {
   return (
     <FlatList
-      data={objetivos}
+      data={metas}
       keyExtractor={item => item.id}
-      renderItem={({ item }) => <ObjetivoItem objetivo={item} onChange={onChange} />}
+      renderItem={({ item }) => <MetaItem meta={item} onChange={onChange} />}
       contentContainerStyle={{ paddingBottom: 55 }}
     />
   );
 };
 
-export default ListaObjetivos;
+export default ListaMetas;
