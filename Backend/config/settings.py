@@ -29,10 +29,10 @@ DEBUG = True
 
 
 #TO ALLOW MOBILE ACCES: 
-#ALLOWED_HOSTS = ['localhost', '127.0.0.1', "<your_ip>"]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', "192.168.1.14"]
 
 #To only web acces:
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'ceapp.CustomUser'
 
@@ -156,8 +156,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #For comunication with others (no funciona desde celulares):
 '''
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8081",
-    "http://localhost:8000",
+    "http://192.168.1.14:8081",
+    "http://192.168.1.14:8000",
 ]
 '''
 
