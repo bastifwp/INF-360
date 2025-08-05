@@ -1,9 +1,6 @@
-import React from 'react';
+import React from "react";
+import { FormularioObjetivo } from "@/components/plan/FormularioObjetivo";
 
-import FormularioObjetivo from '../../../../components/profesional/FormularioObjetivo';
-
-const ObjetivoEditar = () => {
+export default function ObjetivoEditar() {
   return <FormularioObjetivo />;
 };
-
-export default ObjetivoEditar;

@@ -1,13 +1,15 @@
 import { useRouter } from "expo-router";
-import { View, Text } from "react-native";
 import { useEffect, useState } from "react";
-
-import { useAuth } from "./context/auth";
+import { useAuth } from "@/context/auth";
+import { MensajeVacio } from "@/components/MensajeVacio";
 
 export default function Index() {
 
-  const { user } = useAuth();
   const router = useRouter();
+
+  const { user } = useAuth();
+  
+  //ESTADOS
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -17,30 +19,27 @@ export default function Index() {
   useEffect(() => {
     if (!isReady) return;
     if (user === undefined) return;
-
-    console.log("[./app/index.tsx] Usuario autenticado:", user);
-
+    console.log("[index] Usuario autenticado:", user);
     if (user) {
       if (user.role === "profesional") {
-        console.log("[./app/index.tsx] Redirigiendo a profesional...");
+        console.log("[index] Redirigiendo a profesional...");
         router.replace("/profesional");
       } else if (user.role === "cuidador") {
-        console.log("[./app/index.tsx] Redirigiendo a cuidador...");
+        console.log("[index] Redirigiendo a cuidador...");
         router.replace("/cuidador");
       } else {
-        console.log("[./app/index.tsx] Rol no reconocido:", user.role);
-        router.replace("/cuidador");
+        console.log("[index] Rol no reconocido:", user.role);
+        router.replace("/login");
       }
     } else {
-      console.log("[./app/index.tsx] Redirigiendo a login...");
+      console.log("[index] Redirigiendo a login...");
       router.replace("/login");
     }
   }, [user, isReady]);
 
+  //VISTA
   return (
-    <View className="flex-1 justify-center items-center">
-      <Text>Redirigiendo...</Text>
-    </View>
+    <MensajeVacio mensaje={`Redirigiendo...`}/>
   );
 
 }

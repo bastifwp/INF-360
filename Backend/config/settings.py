@@ -29,10 +29,10 @@ DEBUG = True
 
 
 #TO ALLOW MOBILE ACCES: 
-#ALLOWED_HOSTS = ['localhost', '127.0.0.1', "<your_ip>"]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', "<your_ip>"]
 
 #To only web acces:
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'ceapp.CustomUser'
 
@@ -106,8 +106,8 @@ DATABASES = {
         'NAME': os.getenv("POSTGRES_DB", "ceapp"),
         'USER': os.getenv("POSTGRES_USER", "ceapp_user"),
         'PASSWORD': os.getenv("POSTGRES_PASSWORD", "ceapp_pass"),
-        'HOST': 'db',
-        'PORT': '5432',
+        'HOST': os.getenv("DB_HOST", "db"),
+        'PORT': os.getenv("DB_PORT", "5432"),
     }
 }
 

@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@react-native-community/checkbox": "^0.5.20",
-    "react-native-multiple-select": "^0.5.12"
-  }
-}
