@@ -148,14 +148,24 @@ export function BotonAgregar({ onPress }: { onPress: () => void }) {
   return (
     <TouchableOpacity
       onPress={onPress}
-      className="absolute"
       style={{
-        bottom: 10,
-        right: 10,
+        position: "absolute",
+        bottom: 16,
+        right: 16,
+        width: 50,
+        height: 50,
+        borderRadius: 30,
+        backgroundColor: colors.secondary,
+        justifyContent: "center",
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 3,
+        elevation: 5,
       }}
-      accessibilityLabel="Agregar contenido"
     >
-      <Ionicons name="add-circle" size={60} color={colors.secondary}/>
+      <Ionicons name="add" size={40} color={colors.white} />
     </TouchableOpacity>
   );
 }
