@@ -13,6 +13,8 @@ module.exports = {
         lightgrey: "#F3F4F6",
         mediumgrey: "#999999",
         mediumdarkgrey: "#555555",
+        mediumred: "#E53935",
+        lightred: "#FFE6E6",
         light:"#FCFCFC"
       }
     },

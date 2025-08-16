@@ -1,6 +1,6 @@
 import { Slot } from "expo-router";
 import { View } from "react-native";
-import { Header } from "@/components/Header";
+import { Header } from "@/components/layout/Header";
 
 export default function LayoutUsuario() {
   return (

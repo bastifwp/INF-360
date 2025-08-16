@@ -1,13 +1,13 @@
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/auth";
-import { MensajeVacio } from "@/components/MensajeVacio";
+import { IndicadorCarga } from "@/components/base/IndicadorCarga";
 
 export default function Index() {
 
-  const router = useRouter();
-
   const { user } = useAuth();
+
+  const router = useRouter();
   
   //ESTADOS
   const [isReady, setIsReady] = useState(false);
@@ -39,7 +39,7 @@ export default function Index() {
 
   //VISTA
   return (
-    <MensajeVacio mensaje={`Redirigiendo...`}/>
+    <IndicadorCarga/>
   );
 
 }

@@ -1,8 +1,9 @@
 import React from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
 import { useLocalSearchParams, usePathname, useRouter } from "expo-router";
+import { Image, Platform, Text, TouchableOpacity, View } from "react-native";
+import { useAuth } from "@/context/auth";
 import { icons } from "@/constants/icons";
-import { colores } from "@/constants/colores";
+import { colors } from "@/constants/colors";
 import { useDescartarCambios } from "@/context/DescartarCambios";
 
 function usarDescartarCambios(pathname: string): boolean {
@@ -17,12 +18,17 @@ const FooterItem = ({ icon, label, isActive, onPress }: any) => (
   >
     <Image
       source={icon}
-      className="w-[24px] h-[24px] mt-[12px]"
-      style={{ tintColor: isActive ? colores.white : colores.mediumgrey }}
+      className="mt-2"
+      style={{
+        tintColor: isActive ? colors.white : colors.mediumgrey,
+        width: Platform.OS === "web" ? 24 : 24,
+        height: Platform.OS === "web" ? 24 : 24,
+      }}
+      resizeMode="contain"
     />
     <Text
-      className="my-[9px] text-xs"
-      style={{ color: isActive ? colores.white : colores.mediumgrey }}
+      className="text-xs my-2"
+      style={{ color: isActive ? colors.white : colors.mediumgrey }}
     >
       {label}
     </Text>
@@ -35,11 +41,14 @@ export function Footer() {
 
   const router = useRouter();
 
+  const pathname = usePathname();
+
   const { paciente } = useLocalSearchParams();
 
-  const pathname = usePathname();
-  const isCuidador = pathname.includes("/cuidador");
-  const isProfesional = pathname.includes("/profesional");
+  const { user } = useAuth();
+  const isProfesional = user?.role === "profesional";
+  const isCuidador = user?.role === "cuidador";
+  
   if (!paciente || (!isProfesional && !isCuidador)) return null;
 
   const items = isProfesional

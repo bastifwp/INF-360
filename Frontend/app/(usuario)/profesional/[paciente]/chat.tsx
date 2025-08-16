@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useMemo } from "react";
 import { FlatList, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { Titulo } from "@/components/Titulo";
-import { colores } from "@/constants/colores";
+import { Titulo } from "@/components/base/Titulo";
+import { colors } from "@/constants/colors";
 
 export default function Chat() {
 
@@ -117,7 +117,7 @@ export default function Chat() {
       <View className="flex-1"
         style={{
           borderTopWidth: 0.5,
-          borderTopColor: colores.mediumgrey,
+          borderTopColor: colors.mediumgrey,
         }}
       >
 
@@ -128,20 +128,20 @@ export default function Chat() {
             
             if (item.tipo === "nuevo-separador") {
               return (
-                <View className="flex-row items-center my-2">
+                <View className="flex-row items-center my-1">
                   <View className="flex-1 h-px bg-secondary" />
                   <View className="bg-secondary rounded-full px-4 py-1 items-center">
-                    <Text className="text-white text-base">Nuevos mensajes</Text>
+                    <Text className="text-white text-sm">Nuevos mensajes</Text>
                   </View>
                   <View className="flex-1 h-px bg-secondary" />
-              </View>
+                </View>
               );
             }
 
             if (item.tipo === "separador-fecha") {
               return (
                 <View className="bg-mediumdarkgrey rounded-full px-4 py-1 my-2 items-center self-center">
-                  <Text className="text-white text-base">{formatearFecha(item.fecha)}</Text>
+                  <Text className="text-white text-sm">{formatearFecha(item.fecha)}</Text>
                 </View>
               );
             }
@@ -155,7 +155,7 @@ export default function Chat() {
                 <Text className="text-black text-base font-semibold">{item.nombre}</Text>
                 <View
                   className="p-2 rounded-lg"
-                  style={{ backgroundColor: item.propio ? colores.lightblue : colores.lightpurple }}
+                  style={{ backgroundColor: item.propio ? colors.lightblue : colors.lightpurple }}
                 >
                   <Text className="text-black text-base">{item.mensaje}</Text>
                 </View>
@@ -169,7 +169,7 @@ export default function Chat() {
           className="bg-light pb-4 pt-2 flex-row items-end"
           style={{
             borderTopWidth: 0.5,
-            borderTopColor: colores.mediumgrey
+            borderTopColor: colors.mediumgrey
           }}
         >
           <TextInput

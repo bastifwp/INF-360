@@ -1,7 +1,7 @@
 import { Slot, usePathname, useRouter } from "expo-router";
 import { Image, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 import { images } from "@/constants/images";
-import { BotonEsquinaSuperiorIzquierda } from "@/components/Boton";
+import { BotonEsquinaSuperior } from "@/components/base/Boton";
 
 export default function LayoutAuth() {
 
@@ -20,7 +20,8 @@ export default function LayoutAuth() {
         <View className="flex-1 bg-primary px-6 py-10 justify-center">
 
           {pathname === "/registro" && (
-            <BotonEsquinaSuperiorIzquierda
+            <BotonEsquinaSuperior
+              tipo={"izquierda"}
               iconName="arrow-back"
               onPress={() => router.push("/login")}
             />
@@ -29,10 +30,10 @@ export default function LayoutAuth() {
           <View className="mb-4 flex-row items-center justify-center">
             <Image
               source={images.logo}
+              className="mr-2"
               style={{
                 width: Platform.OS === "web" ? 48 : 80,
-                height: Platform.OS === "web" ? 48 : 80,
-                marginRight: 16,
+                height: Platform.OS === "web" ? 48 : 80
               }}
               resizeMode="contain"
             />

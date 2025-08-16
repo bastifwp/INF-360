@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, usePathname } from "expo-router";
-import { View, Image, Text, Alert } from "react-native";
+import { View, Image, Platform, Text, Alert } from "react-native";
 import { images } from "@/constants/images";
-import { Menu } from "@/components/Menu";
-import { BotonEsquinaSuperiorIzquierda } from "@/components/Boton";
+import { Menu } from "@/components/layout/Menu";
+import { BotonEsquinaSuperior } from "@/components/base/Boton";
 import { useDescartarCambios } from "@/context/DescartarCambios";
 
 //HEADER
@@ -43,9 +43,13 @@ export function Header() {
     usarDescartarCambios = true;
   } else if (ruta_partes.length === 2) {
     icono = 1;
-  } else if (ruta.includes("/objetivo")) {
+  } else if (ruta.includes("/objetivo-general-agregar") || ruta.includes("/objetivo-especifico-agregar")) {
     icono = 2;
     ruta_atras = `/${rol}/${paciente}/plan`;
+    usarDescartarCambios = true;
+  } else if (ruta.includes("/actividad-agregar")) {
+    icono = 2;
+    ruta_atras = `/${rol}/${paciente}/actividades`;
     usarDescartarCambios = true;
   } else if (ruta.includes("/entrada")) {
     icono = 2;
@@ -78,10 +82,11 @@ export function Header() {
 
   return (
 
-    <View className="flex-row bg-primary h-20 justify-center items-center relative">
+    <View className="flex-row bg-primary h-16 justify-center items-center relative">
 
       {icono === 0 && (
-        <BotonEsquinaSuperiorIzquierda
+        <BotonEsquinaSuperior
+          tipo={"izquierda"}
           onPress={handlePress}
           iconName="log-out-outline"
           accessibilityLabel="Cerrar sesión"
@@ -89,7 +94,8 @@ export function Header() {
       )}
 
       {icono === 1 && (
-        <BotonEsquinaSuperiorIzquierda
+        <BotonEsquinaSuperior
+          tipo={"izquierda"}
           onPress={() => setMenu(true)}
           iconName="menu"
           accessibilityLabel="Abrir menú"
@@ -97,21 +103,32 @@ export function Header() {
       )}
 
       {icono === 2 && (
-        <BotonEsquinaSuperiorIzquierda
+        <BotonEsquinaSuperior
+          tipo={"izquierda"}
           onPress={handlePress}
           iconName="arrow-back"
           accessibilityLabel="Volver atrás"
         />
       )}
 
-      <View className="flex-row">
-        <Image source={images.logo} className="mr-3 h-12 w-12 align-middle" />
-        <Text className="text-3xl text-light font-extrabold align-middle">
-          CEApp
-        </Text>
+      <View className="flex-row items-center">
+        <Image
+          source={images.logo}
+          className="mr-2 align-middle"
+          style={{
+            width: Platform.OS === "web" ? 40 : 40,
+            height: Platform.OS === "web" ? 40 : 40,
+          }}
+          resizeMode="contain"
+        />
+        <Text className="text-2xl text-light font-extrabold align-middle">CEApp</Text>
       </View>
 
-      <Menu visible={menu} onClose={() => setMenu(false)} />
+      <Menu
+        visible={menu}
+        onClose={() => setMenu(false)}
+        paciente={paciente}
+      />
 
     </View>
 
@@ -126,7 +143,7 @@ type HeaderPacienteProps = {
 export function HeaderPaciente({ nombre }: HeaderPacienteProps) {
   return (
     <View className="bg-secondary px-4 py-2 flex-row items-center justify-center gap-1">
-      <Ionicons name="heart-circle-outline" size={24} color="white" />
+      <Ionicons name="heart-circle-outline" size={20} color="white" />
       <Text className="text-white text-base font-bold">
         Paciente: {nombre}
       </Text>

@@ -3,107 +3,155 @@ import React, { useEffect, useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "@/context/auth";
-import { colores } from "@/constants/colores";
-import { Etiqueta } from "@/components/Etiqueta";
-import { BotonAgregar } from "@/components/Boton";
-import { IconoEntrada } from "@/components/Icono";
-import { TarjetaExpandido } from "@/components/Tarjeta";
-import { MensajeVacio } from "@/components/MensajeVacio";
-import { IndicadorCarga } from "@/components/IndicadorCarga";
-import { TituloRecargar, TituloSeccion } from "@/components/Titulo";
+import { colors } from "@/constants/colors";
+import { Etiqueta } from "@/components/base/Etiqueta";
+import { BotonAgregar } from "@/components/base/Boton";
+import { TextoBloque } from "@/components/base/TextoBloque";
+import { TarjetaExpandido } from "@/components/base/Tarjeta";
+import { MensajeVacio } from "@/components/base/MensajeVacio";
+import { Titulo, TituloSeccion } from "@/components/base/Titulo";
+import { IndicadorCarga } from "@/components/base/IndicadorCarga";
 
+//NOTA: ENTRADA DEBERÍA CAMBIARSE A DDMMYYYY, y no YYYYMMDD
+
+//ÁNIMO
+interface Animo {
+  id: string | number;
+  nombre: string;
+  emoji: string;
+}
 const animos = [
-  { id: "happy", emoji: "😊", nombre: "Feliz" },
-  { id: "neutral", emoji: "😐", nombre: "Neutral" },
-  { id: "sad", emoji: "😢", nombre: "Triste" },
-  { id: "angry", emoji: "😡", nombre: "Molesto" },
-  { id: "excited", emoji: "🤩", nombre: "Entusiasmado" },
-  { id: "tired", emoji: "🥱", nombre: "Cansado" },
-  { id: "confused", emoji: "😕", nombre: "Confundido" },
-  { id: "surprised", emoji: "😮", nombre: "Sorprendido" },
+  { id: "Feliz", emoji: "😊", nombre: "Feliz" },
+  { id: "Triste", emoji: "😢", nombre: "Triste" },
+  { id: "Molesto", emoji: "😡", nombre: "Molesto" },
+  { id: "Entusiasmado", emoji: "🤩", nombre: "Entusiasmado" },
+  { id: "Sorprendido", emoji: "😮", nombre: "Sorprendido" },
+  { id: "Confundido", emoji: "😕", nombre: "Confundido" },
+  { id: "Cansado", emoji: "🥱", nombre: "Cansado" },
+  { id: "Neutral", emoji: "😐", nombre: "Neutral" },
 ];
 
-const categoriaColores = {
-  Comunicación: '#4f83cc', // Azul
-  Motricidad: '#81c784',   // Verde
-  Cognición: '#f48fb1',    // Rosado
-  Conducta: '#ffb74d',     // Naranjo
-  default: '#b0bec5',      // Gris
-};
+//ENTRADA
+interface Actividad {
+  id: string | number;
+  titulo: string;
+}
+interface ObjetivoEspecifico {
+  id: string | number;
+  titulo: string;
+  estado?: number;
+}
+interface Entrada {
+  id: string | number;
+  titulo: string;
+  fecha: string;
+  autor: string;
+  animo: string;
+  selected_obj: ObjetivoEspecifico[];
+  actividades?: Actividad[];
+  comentarios?: string;
+}
+
+//ICONO: ENTRADA
+interface EntradaIconoProps {
+  emoji: string;
+}
+export function EntradaIcono({ emoji }: EntradaIconoProps) {
+  return (
+    <View className="w-12 h-12 justify-center items-center">
+      <View className="w-12 h-12 rounded-full bg-primary justify-center items-center shadow-md">
+        <View className="w-8 h-8 rounded-full bg-white justify-center items-center">
+          <Text className="text-xl text-center">{emoji}</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
 
 //ITEM: ENTRADA
-const EntradaItem = ({ entrada }) => {
-  const getObjetivoColor = (categoria?: string) => {
-    if (!categoria) {
-      return categoriaColores.default;
-    }
-    return categoriaColores[categoria] || categoriaColores.default;
-  };
+interface EntradaItemProps {
+  entrada: Entrada;
+}
+const EntradaItem = ({ entrada }: EntradaItemProps) => {
   const getAnimoEmoji = (id?: string) => {
     const found = animos.find(a => a.id === id);
     return found ? found.emoji : "🙂";
   };
   const getAnimoNombre = (id?: string) => {
     const found = animos.find(a => a.id === id);
-    return found ? found.nombre : "Desconocido";
+    return found ? found.nombre : "Neutral";
   };
-  const animoID = "happy"; //MOCKUP -> REEMPLAZAR
+  const animoID = "Neutral"; //MOCKUP -> REEMPLAZAR
   const animoEmoji = getAnimoEmoji(animoID);
   const animoNombre = getAnimoNombre(animoID);
   return (
     <TarjetaExpandido
       titulo={entrada.titulo}
       subtitulo={[
-        `Fecha: ${entrada.fecha}`,
         `Autor: ${entrada.autor}`,
+        `Fecha: ${entrada.fecha}`,
       ]}
-      icono={
-        <IconoEntrada
-          colores={entrada.selected_obj?.length
-            ? entrada.selected_obj.map(obj => getObjetivoColor(obj.categoria))
-            : [categoriaColores.default]
-          }
-          emoji={animoEmoji}
-        />
-      }
+      icono={<EntradaIcono emoji={animoEmoji}/>}
       expandidoContenido={
-        <>
-          <View className="bg-light rounded-lg p-2 my-2">
-            <Text className="text-black">{entrada.comentarios}</Text>
-          </View>
-          <View>
-            <TituloSeccion children={"Estado de ánimo:"} />
-            <Etiqueta
-              texto={`${animoEmoji} ${animoNombre}`}
-              colorFondo={colores.primary}
-              colorTexto={colores.white}
-            />
-          </View>
-          {entrada.selected_obj.length === 0 
-            ? null
-            : (<View>
-                <TituloSeccion children={"Objetivos trabajados:"} />
-                {entrada.selected_obj?.map((item, index) => (
-                  <Etiqueta
-                    key={index}
-                    texto={item.titulo}
-                    colorFondo={getObjetivoColor(item.categoria)}
-                  />
+        <View className="gap-2">
+          {entrada.comentarios && entrada.comentarios.length > 0 && (<TextoBloque texto={entrada.comentarios}/>)}
+          {animoEmoji && ( //cambiar animoEmoji por animoID
+            <View className="gap-2">
+              <TituloSeccion children={"Estado de ánimo:"} />
+              <Etiqueta
+                texto={`${animoEmoji} ${animoNombre}`}
+                fondoColor={colors.primary}
+              />
+            </View>
+          )}
+          {entrada.selected_obj.length > 0 && (
+            <View className="gap-2">
+              <TituloSeccion>Objetivos específicos trabajados:</TituloSeccion>
+              <View className="flex-row flex-wrap gap-2">
+                {entrada.selected_obj.map((item) => (
+                  <View
+                    key={item.id}
+                    className="bg-primary rounded-full py-2 px-4"
+                    style={{ backgroundColor:
+                      item.estado === 1 ? colors.mediumgreen :
+                      item.estado === 2 ? colors.mediumyellow :
+                      item.estado === 3 ? colors.mediumred :
+                      colors.primary
+                    }}>
+                    <Text className="text-white text-base font-semibold">{item.titulo}</Text>
+                  </View>
                 ))}
-              </View>)
-          }
-        </>
+              </View>
+            </View>
+          )}
+          {entrada.actividades && entrada.actividades.length > 0 && (
+            <View className="gap-2">
+              <TituloSeccion>Actividades realizadas:</TituloSeccion>
+              <View className="flex-row flex-wrap gap-2">
+                {entrada.actividades.map((item) => (
+                  <View key={item.id} className="bg-primary rounded-full py-2 px-4">
+                    <Text className="text-white font-semibold">{item.titulo}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+        </View>
       }
     />
   );
 };
 
 //LISTA: ENTRADAS
-const ListaEntradas = ({ entradas }) => {
+interface EntradasListaProps {
+  entradas: Entrada[];
+}
+const EntradasLista = ({ entradas }: EntradasListaProps) => {
+  //VISTA
   return (
     <FlatList
       data={entradas}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => <EntradaItem entrada={item} />}
       contentContainerStyle={{ paddingBottom: 50 }}
     />
@@ -113,29 +161,32 @@ const ListaEntradas = ({ entradas }) => {
 //BITÁCORA
 export default function Bitacora() {
 
-  const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
+  const { authToken, refreshToken, createApi, setAuthToken } = useAuth();
 
   const router = useRouter();
 
   const parametros = useLocalSearchParams();
   const recargar = parametros.recargar;
   const paciente = parametros.paciente;
-  const [pacienteID, pacienteEncodedNombre] = paciente?.split("-") ?? [null, null];
+  const pacienteString = Array.isArray(paciente) ? paciente[0] : paciente;
+  const [pacienteID, pacienteEncodedNombre] = pacienteString?.split("-") ?? [null, null];
 
+  //ALMACENAMIENTO LOCAL
   const datosAlmacenamiento = `bitacora_${pacienteID}`;
   const fechaAlmacenamiento = `bitacora_${pacienteID}_fecha`;
 
   //ESTADOS
-  const [entradas, setEntradas] = useState([]);
+  const [entradas, setEntradas] = useState<Entrada[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
-
+  const [busqueda, setBusqueda] = useState("");
   const recargarNuevaEntrada = useRef(recargar === "1");
 
   useEffect(() => {
     fetchEntradas();
   }, [authToken, refreshToken]);
 
+  //FETCH: ENTRADAS
   const fetchEntradas = async (forzarRecargar = false) => {
     if (!authToken || !refreshToken) return;
     setIsLoading(true);
@@ -180,30 +231,54 @@ export default function Bitacora() {
     router.push(`/profesional/${paciente}/bitacora/entrada-agregar`);
   }
 
+  //FILTRO
+  const entradasBusqueda = entradas.filter((entrada) => {
+    const textoBusqueda = busqueda.toLowerCase();
+    const titulo = entrada.titulo?.toLowerCase() ?? "";
+    const fecha = entrada.fecha?.toLowerCase() ?? "";
+    const autor = entrada.autor?.toLowerCase() ?? "";
+    const comentarios = entrada.comentarios?.toLowerCase() ?? "";
+    const animo = animos.find(a => a.id === entrada.animo)?.nombre.toLowerCase() ?? "";
+    const objetivosEspecificos = entrada.selected_obj
+      ?.map(objetivo => objetivo.titulo?.toLowerCase() ?? "")
+      .join(" ") ?? "";
+    const actividades = entrada.actividades
+      ?.map(actividad => actividad.titulo?.toLowerCase() ?? "")
+      .join(" ") ?? "";
+    return (
+      titulo.includes(textoBusqueda) ||
+      fecha.includes(textoBusqueda) ||
+      autor.includes(textoBusqueda) ||
+      comentarios.includes(textoBusqueda) ||
+      animo.includes(textoBusqueda) ||
+      objetivosEspecificos.includes(textoBusqueda) ||
+      actividades.includes(textoBusqueda)
+    );
+  });
+
   //VISTA
   return (
     <View className="flex-1">
-      <TituloRecargar onPress={() => fetchEntradas(true)}>
+      <Titulo onPressRecargar={() => fetchEntradas(true)} onBusquedaChange={setBusqueda}>
         Bitácora
-      </TituloRecargar>
+      </Titulo>
       <View className="flex-1">
         {isLoading ? (
           <IndicadorCarga/>
         ) : error ? (
           <MensajeVacio
-            mensaje={`Hubo un error al cargar las entradas.`}
-            recargar={true}
-            onPress={() => fetchEntradas(true)}
+            mensaje={`Hubo un error al cargar las entradas.\nIntenta nuevamente.`}
+            onPressRecargar={() => fetchEntradas(true)}
           />
         ) : entradas.length === 0 ? (
           <MensajeVacio
-            mensaje={`Sin entradas por ahora.\n¡Comienza a registrar el progreso del paciente usando el botón ＋!`}/>
+            mensaje={`Aún no tienes entradas.\n¡Comienza a registrar el progreso del paciente usando el botón ＋!`}/>
         ) : (
-          <ListaEntradas entradas={entradas} />
+          <EntradasLista entradas={entradasBusqueda}/>
         )}
       </View>
       <BotonAgregar onPress={handleAgregar}/>
     </View>
-  )
+  );
   
 }

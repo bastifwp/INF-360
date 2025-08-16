@@ -8,6 +8,7 @@ const API_BASE_URL = Constants.expoConfig?.extra?.apiBaseUrl;
 
 //TIPOS
 type User = {
+  id: string;
   email: string;
   nombre: string;
   role: string;
@@ -91,6 +92,7 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
 
       const authtoken = response.data.access;
       const refreshToken = response.data.refresh;
+      const id = response.data.id;
       const nombre = response.data.nombre;
       const role = response.data.role;
       const cargo = response.data.cargo;
@@ -98,7 +100,7 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
 
       setAuthToken(authtoken);
       setRefreshToken(refreshToken);
-      setUser({ email: email, nombre: nombre, role: role, cargo: cargo, institucion: institucion });
+      setUser({ id: id, email: email, nombre: nombre, role: role, cargo: cargo, institucion: institucion });
     } catch (error: unknown) {
       throw error;
     }

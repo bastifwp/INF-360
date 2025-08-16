@@ -1,124 +1,44 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useAuth } from "@/context/auth";
-import { Boton } from "@/components/Boton";
-import { Titulo } from "@/components/Titulo";
-import { colores } from "@/constants/colores";
-import { MensajeVacio } from "@/components/MensajeVacio";
-import { IndicadorCarga } from "@/components/IndicadorCarga";
-import { FormularioCampo } from "@/components/FormularioCampo";
+import { colors } from "@/constants/colors";
+import { Boton } from "@/components/base/Boton";
+import { Titulo } from "@/components/base/Titulo";
+import { MensajeVacio } from "@/components/base/MensajeVacio";
+import { IndicadorCarga } from "@/components/base/IndicadorCarga";
 import { DescartarCambiosContext } from "@/context/DescartarCambios";
+import { FormularioCampo, FormularioCampoLabel, FormularioCampoMultiSelect } from "@/components/base/Entrada";
 
-const animos = [
-  { id: "happy", emoji: "😊", nombre: "Feliz" },
-  { id: "neutral", emoji: "😐", nombre: "Neutral" },
-  { id: "sad", emoji: "😢", nombre: "Triste" },
-  { id: "angry", emoji: "😡", nombre: "Molesto" },
-  { id: "excited", emoji: "🤩", nombre: "Entusiasmado" },
-  { id: "tired", emoji: "🥱", nombre: "Cansado" },
-  { id: "confused", emoji: "😕", nombre: "Confundido" },
-  { id: "surprised", emoji: "😮", nombre: "Sorprendido" },
-];
+//ACÁ TENGO UN PROBLEMA PORQUE PARECE QUE ALGUNOS IDS SON INTEGER Y OTROS SON STRINGS
 
-const categoriaColores = {
-  Comunicación: '#4f83cc',
-  Motricidad: '#81c784',
-  Cognición: '#f48fb1',
-  Conducta: '#ffb74d',
-  default: '#b0bec5',
-};
-
-//FORMULARIO: OBJETIVO(S)
-export function FormularioCampoMultiSelectObjetivo({ label, items, selected, onChange, placeholder }) {
-  //ESTADOS
-  const [search, setSearch] = useState('');
-  //FILTRAR OBJETIVOS SEGÚN BÚSQUEDA
-  const filteredItems = useMemo(() => {
-    if (!search) return items;
-    return items.filter(item =>
-      item.titulo.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [search, items]);
-  //SELECCIONAR Y DESELECCIONAR ÍTEMS
-  const toggleItem = id => {
-    if (selected.includes(id)) {
-      onChange(selected.filter(i => i !== id));
-    } else {
-      onChange([...selected, id]);
-    }
-  };
-  return (
-    <View>
-      <Text className="font-semibold mb-2">{label}</Text>
-      {/*CHIPS*/}
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 2 }}>
-        {selected.map(id => {
-          const item = items.find(i => i.id === id);
-          if (!item) return null;
-          const color = categoriaColores[item.categoria] || categoriaColores.default;
-          return (
-            <View
-              key={id}
-              style={{
-                backgroundColor: color,
-                borderRadius: 18,
-                paddingHorizontal: 12,
-                paddingVertical: 4,
-                marginRight: 8,
-                marginBottom: 6,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-            >
-              <Text style={{ color: 'white', marginRight: 6 }}>{item.titulo}</Text>
-              <TouchableOpacity onPress={() => toggleItem(id)}>
-                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20 }}>×</Text>
-              </TouchableOpacity>
-            </View>
-          );
-        })}
-      </View>
-      <FormularioCampo
-        value={search}
-        onChangeText={setSearch}
-        placeholder={placeholder}
-        tipo={2}
-        maxLength={255}
-      />
-      {/*LISTA*/}
-      <ScrollView style={{ maxHeight: 160, marginBottom: 8 }} nestedScrollEnabled={true} persistentScrollbar={true}>
-        {filteredItems.map(item => {
-            const isSelected = selected.includes(item.id);
-            const color = categoriaColores[item.categoria] || categoriaColores.default;
-            return (
-            <TouchableOpacity
-                key={item.id.toString()}
-                onPress={() => toggleItem(item.id)}
-                style={{
-                padding: 12,
-                backgroundColor: colores.lightgrey,
-                borderWidth: 1,
-                borderColor: isSelected ? color : colores.lightgrey,
-                borderRadius: 12,
-                marginBottom: 6,
-                }}
-            >
-                <Text style={{ color: isSelected ? color : colores.mediumdarkgrey }}>{item.titulo}</Text>
-            </TouchableOpacity>
-            );
-        })}
-      </ScrollView>
-    </View>
-  );
+interface Animo {
+  id: string | number;
+  nombre: string;
+  emoji: string;
 }
-
-//FORMULARIO: ESTADO DE ÁNIMO
-export function FormularioCampoAnimo({ value, onChange }) {
+const animos = [
+  { id: "Feliz", emoji: "😊", nombre: "Feliz" },
+  { id: "Triste", emoji: "😢", nombre: "Triste" },
+  { id: "Molesto", emoji: "😡", nombre: "Molesto" },
+  { id: "Entusiasmado", emoji: "🤩", nombre: "Entusiasmado" },
+  { id: "Sorprendido", emoji: "😮", nombre: "Sorprendido" },
+  { id: "Confundido", emoji: "😕", nombre: "Confundido" },
+  { id: "Cansado", emoji: "🥱", nombre: "Cansado" },
+  { id: "Neutral", emoji: "😐", nombre: "Neutral" },
+];
+interface FormularioCampoAnimoProps {
+  label: string;
+  asterisco: boolean;
+  tipo: number;
+  value?: Animo;
+  onChange: (selected: Animo) => void;
+}
+export function FormularioCampoAnimo({ label, asterisco, tipo, value, onChange }: FormularioCampoAnimoProps) {
   return (
     <View className="w-full mb-2">
-      <Text className="text-black font-semibold mb-2">Estado de ánimo</Text>
+      <FormularioCampoLabel label={label} asterisco={asterisco} tipo={tipo}/>
       {value 
         ? (<Text className="text-primary font-bold mb-4 text-center">{value.emoji} {value.nombre}</Text>)
         : (<Text className="text-mediumdarkgrey mb-4 text-center">Selecciona un estado de ánimo</Text>)
@@ -131,7 +51,7 @@ export function FormularioCampoAnimo({ value, onChange }) {
               key={item.id}
               onPress={() => onChange(item)}
               className="rounded-full p-4 w-16 h-16 justify-center items-center"
-              style={{backgroundColor: seleccionado ? colores.primary : colores.lightgrey}}
+              style={{backgroundColor: seleccionado ? colors.primary : colors.lightgrey}}
             >
               <Text className="text-2xl">{item.emoji}</Text>
             </TouchableOpacity>
@@ -142,37 +62,55 @@ export function FormularioCampoAnimo({ value, onChange }) {
   );
 }
 
+//ACTIVIDAD
+interface Actividad {
+  id: string;
+  titulo: string;
+}
+const mockActividades = [
+  { id: "1", titulo: "Escuchar música" },
+  { id: "2", titulo: "Hacer dibujo" },
+  { id: "3", titulo: "Ejercicios de motricidad fina" },
+  { id: "4", titulo: "Leer cuento" },
+  { id: "5", titulo: "Juego de roles" },
+  { id: "6", titulo: "Ejercicios de respiración" },
+];
+
 //ENTRADA-AGREGAR
 export default function EntradaAgregar() {
 
-  const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
+  const { authToken, refreshToken, createApi, setAuthToken } = useAuth();
 
   const router = useRouter();
   
   const navigation = useNavigation();
 
   const { paciente } = useLocalSearchParams();
-  const [pacienteID, pacienteEncodedNombre] = paciente?.split("-") ?? [null, null];
+  const pacienteString = Array.isArray(paciente) ? paciente[0] : paciente;
+  const [pacienteID, pacienteEncodedNombre] = pacienteString?.split("-") ?? [null, null];
 
   //ESTADOS
-  const [titulo, setTitulo] = useState('');
+  const [titulo, setTitulo] = useState("");
+  const [animo, setAnimo] = useState<Animo | undefined>(undefined);
+  const [objetivosEspecificos, setObjetivosEspecificos] = useState([]);
   const [selected_obj, setSelected_obj] = useState<number[]>([]);
-  const [objetivos, setObjetivos] = useState([]);
-  const [animo, setAnimo] = useState(null);
-  const [comentarios, setComentarios] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [actividades, setActividades] = useState<Actividad[]>([]);
+  const [actividadesSeleccionadas, setActividadesSeleccionadas] = useState<string[]>([]);
+  const [comentarios, setComentarios] = useState("");
   const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingBoton, setIsLoadingBoton] = useState(false);
 
-  //CONSULTA A LA BASE DE DATOS
   useEffect(() => {
-    fetchObjetivos();
+    fetchObjetivosEspecificos();
+    fetchActividades();
   },[authToken, refreshToken]);
 
   useEffect(() => {
-    if (!isLoading && objetivos.length === 0) {
+    if (!isLoading && objetivosEspecificos.length === 0) {
       Alert.alert(
         "Aviso",
-        "No se encontraron objetivos. Para crear una entrada, primero debes tener al menos un objetivo registrado.",
+        "No se encontraron objetivos específicos. Para crear una entrada, primero debes tener al menos un objetivo específico registrado.",
         [{
           text: "Ir al plan de trabajo",
           onPress: () => {router.push(`/profesional/${paciente}/plan?recargar=1`)}
@@ -180,58 +118,81 @@ export default function EntradaAgregar() {
         { cancelable: false }
       )
     }
-  }, [objetivos])
+  }, [objetivosEspecificos])
 
-  //FETCH: OBJETIVOS
-  const fetchObjetivos = async () => {
+  //FETCH: OBJETIVOS ESPECÍFICOS (VINCULADOS AL PROFESIONAL)
+  const fetchObjetivosEspecificos = async () => {
     if (!authToken || !refreshToken) return;
     setIsLoading(true);
-    const api = createApi(authToken, refreshToken, setAuthToken);
-    console.log("[bitácora: entrada-agregar] Obteniendo objetivos...");
-    api
-      .get("/objetivos/" + pacienteID + "/")
-      .then(res => {
-        setObjetivos(res.data);
-        setIsLoading(false);
-        setError(false);
-      })
-      .catch(err => {
-        console.log("[bitácora: entrada-agregar] Error:", err);
-        setIsLoading(false);
-        setError(true);
-      });
+    try {
+      const api = createApi(authToken, refreshToken, setAuthToken);
+      console.log("[bitácora: entrada-agregar] Obteniendo objetivos específicos...");
+      const res = await api.get("/objetivos/" + pacienteID + "/");
+      setObjetivosEspecificos(res.data);
+      setIsLoading(false);
+      setError(false);
+    } catch(err) {
+      console.log("[bitácora: entrada-agregar] Error:", err);
+      setIsLoading(false);
+      setError(true);
+    }
   };
+
+  //FETCH: ACTIVIDADES
+  const fetchActividades = async () => {
+    if (!authToken || !refreshToken) return;
+    setIsLoading(true);
+    try {
+      const api = createApi(authToken, refreshToken, setAuthToken);
+      console.log("[actividades] Obteniendo actividades de la base de datos...");
+      //const res = await api.get("/objetivos/" + pacienteID + "/");
+      setActividades(mockActividades);
+      setIsLoading(false);
+      setError(false);
+    } catch (err) {
+      console.log("[actividades] Error:", err);
+      setIsLoading(false);
+      setError(true);
+    };
+  }
   
   const datosIniciales = useRef({
-    titulo: '',
-    selected_obj: {},
+    titulo: "",
     animo: null,
-    comentarios: '',
+    selected_obj: {},
+    actividadesSeleccionadas: {},
+    comentarios: "",
   });
 
   useEffect(() => {
     datosIniciales.current = {
-      titulo: '',
-      selected_obj: {},
+      titulo: "",
       animo: null,
+      selected_obj: {},
+      actividadesSeleccionadas: {},
       comentarios: '',
     };
   }, []);
 
-  //DETECTAR CAMBIOS
   const hayCambios = () => {
     if (titulo !== datosIniciales.current.titulo) return true;
     if (comentarios !== datosIniciales.current.comentarios) return true;
     if (animo !== datosIniciales.current.animo) return true;
-    const keys = new Set([
+    let keys = new Set([
       ...Object.keys(selected_obj),
       ...Object.keys(datosIniciales.current.selected_obj),
     ]);
     for (const k of keys) {
       if (!!selected_obj[k] !== !!datosIniciales.current.selected_obj[k]) return true;
     }
+    keys = new Set([
+      ...Object.keys(actividadesSeleccionadas),
+      ...Object.keys(datosIniciales.current.actividadesSeleccionadas),
+    ]);
+    for (const k of keys) {
+      if (!!actividadesSeleccionadas[k] !== !!datosIniciales.current.actividadesSeleccionadas[k]) return true;
+    }
     return false;
-
   };
 
   //DESCARTAR CAMBIOS
@@ -249,7 +210,7 @@ export default function EntradaAgregar() {
       );
     });
     return beforeRemoveListener;
-  }, [navigation, titulo, selected_obj, animo, comentarios]);
+  }, [navigation, titulo, animo, selected_obj, actividadesSeleccionadas, comentarios]);
 
   //HANDLE: DESCARTAR CAMBIOS
   const handleDescartarCambiosEntrada = (path) => {
@@ -268,10 +229,14 @@ export default function EntradaAgregar() {
   };
 
   //HANDLE: GUARDAR
-  const handleGuardar = () => {
-    if (!titulo || selected_obj.length == 0 || !animo || !comentarios) {
-      console.log("[bitácora: entrada-agregar] Error. Por favor, completa todos los campos requeridos...");
-      Alert.alert("Error", "Por favor, completa todos los campos requeridos.");
+  const handleGuardar = async () => {
+    if (!titulo || !animo || selected_obj.length == 0) {
+      console.log("[bitácora: entrada-agregar] Error. Por favor, completa todos los campos marcados con *...");
+      Alert.alert("Error", "Por favor, completa todos los campos marcados con *.");
+      return;
+    }
+    if (!authToken || !refreshToken) {
+      console.log("[bitácora: entrada-agregar] Error. No se pudo autenticar...");
       return;
     }
     console.log("[bitácora: entrada-agregar] Guardar entrada:", {
@@ -280,38 +245,39 @@ export default function EntradaAgregar() {
       paciente,
       selected_obj
     });
-    //LLAMADA POST A API
-    {
-      if (!authToken || !refreshToken) return;
+    setIsLoadingBoton(true);
+    try {
       const api = createApi(authToken, refreshToken, setAuthToken);
-      api
-          .post("/bitacora/" + pacienteID + "/", {titulo,
-                                                  comentarios,
-                                                  paciente,
-                                                  selected_obj
-          }, {timeout: 2000})
-          .then(res => {
-            console.log("[bitácora: entrada-agregar] Respuesta:", res.data);
-            Alert.alert(
-              "Éxito",
-              "Entrada guardada correctamente.",
-              [{
-                text: "OK",
-                onPress: () => {router.push(`/profesional/${paciente}/bitacora?recargar=1`)},
-              }]
-            )                 
-          })
-          .catch(err => {
-            console.log("[bitácora: entrada-agregar] Error:", err)
-            Alert.alert(
-              "Error",
-              "La entrada no pudo guardarse. Intente nuevamente.",
-              [{text: "OK"}]
-            )
-          })
-    };
-    //CASO EN EL QUE NO SE GUARDA EXITOSAMENTE
+      const res = await api.post("/bitacora/" + pacienteID + "/", {titulo,
+                                                                   comentarios,
+                                                                   paciente,
+                                                                   selected_obj},
+                                                                  {timeout: 2000}) //AGREGAR ANIMO Y ACTIVIDADES
+      console.log("[bitácora: entrada-agregar] Respuesta:", res.data);
+      Alert.alert(
+        "Éxito",
+        "Entrada guardada correctamente.",
+        [{
+          text: "OK",
+          onPress: () => {router.push(`/profesional/${paciente}/bitacora?recargar=1`)},
+        }]
+      )
+    } catch(err) {
+      console.log("[bitácora: entrada-agregar] Error:", err);
+      Alert.alert(
+        "Error",
+        "La entrada no pudo guardarse. Intenta nuevamente.",
+        [{text: "OK"}]
+      )
+    } finally {
+      setIsLoadingBoton(false);
+    }
   };
+
+  //HANDLE: AGREGAR ACTIVIDAD
+  const handleAgregarActividad = () => { 
+    console.log("[bitácora] Agregando actividad...");
+  }
 
   //VISTA
   return (
@@ -322,54 +288,76 @@ export default function EntradaAgregar() {
         keyboardShouldPersistTaps="handled"
         extraScrollHeight={24}
       >
-        <Titulo>Agregar entrada</Titulo>
+        <Titulo>
+          Agregar entrada
+        </Titulo>
         <View className="flex-1">
           {isLoading ? (
             <IndicadorCarga/>
           ) : error ? (
             <MensajeVacio
-              mensaje={`Hubo un error al cargar los objetivos.`}
-              recargar={true}
-              onPress={() => fetchObjetivos()}
+              mensaje={`Hubo un error al cargar los objetivos específicos o las actividades.\nIntenta nuevamente.`}
+              onPressRecargar={() => {
+                fetchObjetivosEspecificos();
+                fetchActividades();
+              }}
             />
           ) : (
-            <>
+            <View className="gap-2">
               <FormularioCampo
-                label="Título"
+                label={"Título"}
+                asterisco={true}
                 value={titulo}
                 onChangeText={setTitulo}
-                placeholder="Ingresa un título"
-                tipo={2}
+                placeholder={"Ingresa un título"}
                 maxLength={255}
+                tipo={2}
               />
-              <FormularioCampoMultiSelectObjetivo
-                label={"Objetivos"}
-                items={objetivos}
+              <FormularioCampoAnimo
+                label={"Estado de ánimo"}
+                asterisco={true}
+                value={animo}
+                onChange={setAnimo}
+                tipo={2}
+              />
+              <FormularioCampoMultiSelect
+                label={"Objetivos específicos trabajados"}
+                items={objetivosEspecificos}
                 selected={selected_obj}
                 onChange={setSelected_obj}
-                placeholder={"Busca o selecciona objetivos..."}
+                placeholder={"Toca para seleccionar objetivos específicos..."}
+                placeholderSelected={"objetivos específicos seleccionados"}
+                asterisco={true}
+                tipo={2}
               />
-              {objetivos.length === 0 ? (
-                <View className="h-10">
-                  <MensajeVacio mensaje={`No hay objetivos que mostrar. `} />
-                </View>
-              ) : null}
-              <FormularioCampoAnimo value={animo} onChange={setAnimo} />
+              <FormularioCampoMultiSelect
+                label={"Actividades realizadas"}
+                items={actividades}
+                selected={actividadesSeleccionadas}
+                onChange={setActividadesSeleccionadas}
+                placeholder={"Toca para seleccionar actividades..."}
+                placeholderSelected={"actividades seleccionadas"}
+                onAddItem={handleAgregarActividad}
+                asterisco={false}
+                tipo={2}
+              />
               <FormularioCampo
-                label="Comentarios"
+                label={"Comentarios"}
+                asterisco={false}
                 value={comentarios}
                 onChangeText={setComentarios}
-                placeholder="Ingresa comentarios"
-                tipo={2}
+                placeholder={"Ingresa comentarios"}
                 multiline
                 maxLength={4000}
+                tipo={2}
               />
               <Boton
-                texto="Guardar"
+                texto={"Guardar"}
                 onPress={handleGuardar}
+                isLoading={isLoadingBoton}
                 tipo={3}
               />
-            </>
+            </View>
           )
         }
         </View>

@@ -1,22 +1,21 @@
 import { Text, View } from "react-native";
-import { BotonRecargar } from "@/components/Boton";
+import { BotonRecargar } from "@/components/base/Boton";
 
 type MensajeVacioProps = {
   mensaje: string;
   children?: React.ReactNode;
-  recargar?: boolean;
-  onPress?: () => void;
+  onPressRecargar?: () => void;
 };
 
-export function MensajeVacio({ mensaje, children, recargar, onPress }: MensajeVacioProps) {
+export function MensajeVacio({ mensaje, children, onPressRecargar }: MensajeVacioProps) {
   return (
     <View className="flex-1 items-center justify-center">
       <Text className="text-mediumdarkgrey text-center text-base">{mensaje}</Text>
       {children}
-      {recargar && onPress && (
+      {onPressRecargar && (
         <BotonRecargar
           tipo={2}
-          onPress={onPress}
+          onPress={onPressRecargar}
         />
       )}
     </View>

@@ -1,4 +1,4 @@
-import { EquipoPaciente } from "@/components/EquipoPaciente";
+import { EquipoPaciente } from "@/components/vistas/EquipoPaciente";
   
 export default function EquipoProfesional() {
   return (
