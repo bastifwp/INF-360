@@ -1,15 +1,14 @@
 import { Slot } from "expo-router";
 import { View } from "react-native";
-
-import Header from "../components/Header";
+import { Header } from "@/components/Header";
 
 export default function LayoutUsuario() {
   return (
     <>
-        <View style={{ flex: 1 }}>
-            <Header />
-            <Slot />
-        </View>
+      <Header />
+      <View className="flex-1">
+        <Slot />
+      </View>
     </>
   );
 }

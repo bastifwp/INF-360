@@ -1,83 +1,219 @@
-import React, {useState, useEffect} from 'react'
-import { View, Text, TouchableOpacity } from 'react-native'
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { FlatList, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "@/context/auth";
+import { colores } from "@/constants/colores";
+import { Etiqueta } from "@/components/Etiqueta";
+import { BotonAgregar } from "@/components/Boton";
+import { IconoEntrada } from "@/components/Icono";
+import { TarjetaExpandido } from "@/components/Tarjeta";
+import { MensajeVacio } from "@/components/MensajeVacio";
+import { IndicadorCarga } from "@/components/IndicadorCarga";
+import { TituloRecargar, TituloSeccion } from "@/components/Titulo";
 
-import { useAuth } from '@/app/context/auth';
-
-import ListaEntradas from "../../../../components/profesional/ListaEntradas"
-
-// ✅ Lista de entradas ejemplo con selectedObj como lista de objetos
-/*
-const entradas = [
-  {
-    id: '1',
-    nombre: 'Sesión de Terapia Ocupacional',
-    autor: 'Dr. Smith',
-    fecha: '2025-05-01',
-    descripcion: 'Hoy Juanito Perez estaba muy cansado y no quiso realizar todas las actividades',
-    selectedObj: [
-      { nombre: 'Mejorar comunicación', categoria: 'Comunicación' },
-      { nombre: 'Motricidad gruesa', categoria: 'Motricidad' },
-    ],
-  },
-  {
-    id: '2',
-    nombre: 'Sesión de Fonoaudiología',
-    autor: 'Dra. López',
-    fecha: '2025-04-15',
-    descripcion: 'Hoy Juanito Perez estaba de buen ánimo y trabajó de buena manera',
-    selectedObj: [
-      { nombre: 'Desarrollar lenguaje', categoria: 'Comunicación' },
-    ],
-  },
-  // Puedes agregar más entradas si quieres
+const animos = [
+  { id: "happy", emoji: "😊", nombre: "Feliz" },
+  { id: "neutral", emoji: "😐", nombre: "Neutral" },
+  { id: "sad", emoji: "😢", nombre: "Triste" },
+  { id: "angry", emoji: "😡", nombre: "Molesto" },
+  { id: "excited", emoji: "🤩", nombre: "Entusiasmado" },
+  { id: "tired", emoji: "🥱", nombre: "Cansado" },
+  { id: "confused", emoji: "😕", nombre: "Confundido" },
+  { id: "surprised", emoji: "😮", nombre: "Sorprendido" },
 ];
-*/
 
-const Bitacora = () => {
+const categoriaColores = {
+  Comunicación: '#4f83cc', // Azul
+  Motricidad: '#81c784',   // Verde
+  Cognición: '#f48fb1',    // Rosado
+  Conducta: '#ffb74d',     // Naranjo
+  default: '#b0bec5',      // Gris
+};
+
+//ITEM: ENTRADA
+const EntradaItem = ({ entrada }) => {
+  const getObjetivoColor = (categoria?: string) => {
+    if (!categoria) {
+      return categoriaColores.default;
+    }
+    return categoriaColores[categoria] || categoriaColores.default;
+  };
+  const getAnimoEmoji = (id?: string) => {
+    const found = animos.find(a => a.id === id);
+    return found ? found.emoji : "🙂";
+  };
+  const getAnimoNombre = (id?: string) => {
+    const found = animos.find(a => a.id === id);
+    return found ? found.nombre : "Desconocido";
+  };
+  const animoID = "happy"; //MOCKUP -> REEMPLAZAR
+  const animoEmoji = getAnimoEmoji(animoID);
+  const animoNombre = getAnimoNombre(animoID);
+  return (
+    <TarjetaExpandido
+      titulo={entrada.titulo}
+      subtitulo={[
+        `Fecha: ${entrada.fecha}`,
+        `Autor: ${entrada.autor}`,
+      ]}
+      icono={
+        <IconoEntrada
+          colores={entrada.selected_obj?.length
+            ? entrada.selected_obj.map(obj => getObjetivoColor(obj.categoria))
+            : [categoriaColores.default]
+          }
+          emoji={animoEmoji}
+        />
+      }
+      expandidoContenido={
+        <>
+          <View className="bg-light rounded-lg p-2 my-2">
+            <Text className="text-black">{entrada.comentarios}</Text>
+          </View>
+          <View>
+            <TituloSeccion children={"Estado de ánimo:"} />
+            <Etiqueta
+              texto={`${animoEmoji} ${animoNombre}`}
+              colorFondo={colores.primary}
+              colorTexto={colores.white}
+            />
+          </View>
+          {entrada.selected_obj.length === 0 
+            ? null
+            : (<View>
+                <TituloSeccion children={"Objetivos trabajados:"} />
+                {entrada.selected_obj?.map((item, index) => (
+                  <Etiqueta
+                    key={index}
+                    texto={item.titulo}
+                    colorFondo={getObjetivoColor(item.categoria)}
+                  />
+                ))}
+              </View>)
+          }
+        </>
+      }
+    />
+  );
+};
+
+//LISTA: ENTRADAS
+const ListaEntradas = ({ entradas }) => {
+  return (
+    <FlatList
+      data={entradas}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => <EntradaItem entrada={item} />}
+      contentContainerStyle={{ paddingBottom: 50 }}
+    />
+  );
+};
+
+//BITÁCORA
+export default function Bitacora() {
+
+  const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
 
   const router = useRouter();
-  const { paciente } = useLocalSearchParams();
+
+  const parametros = useLocalSearchParams();
+  const recargar = parametros.recargar;
+  const paciente = parametros.paciente;
+  const [pacienteID, pacienteEncodedNombre] = paciente?.split("-") ?? [null, null];
+
+  const datosAlmacenamiento = `bitacora_${pacienteID}`;
+  const fechaAlmacenamiento = `bitacora_${pacienteID}_fecha`;
+
+  //ESTADOS
   const [entradas, setEntradas] = useState([]);
-  const {authToken, refreshToken, createApi, setAuthToken} = useAuth();
-  const [id, encodedNombre] = paciente?.split("-") ?? [null, null];
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const recargarNuevaEntrada = useRef(recargar === "1");
 
   useEffect(() => {
-  
+    fetchEntradas();
+  }, [authToken, refreshToken]);
+
+
+  //Obtenemos las entradas de las bitácoras
+  const fetchEntradas = async (forzarRecargar = false) => {
+
+    //Nos aseguramos que tengamos los tokens
     if (!authToken || !refreshToken) return;
 
-    const api = createApi(authToken, refreshToken, setAuthToken);
+    setIsLoading(true);
+    try {
 
-    api
-        .get('/bitacora/'+id+'/')
-        .then(res => setEntradas(res.data))
-        .catch(err => console.log(err));
-  },[authToken, refreshToken]); // 👈 se ejecuta cada vez que cambien
+      //Verificamos si es que tenemos en almacenamiento 
+      const ahora = Date.now();
+      const cacheFechaAlmacenamiento = await AsyncStorage.getItem(fechaAlmacenamiento);
+      const cacheDatosAlmacenamiento = await AsyncStorage.getItem(datosAlmacenamiento);
+      const tiempo = 5 * 60 * 1000; //Tiempo máximo tal que nos fijaremos en almacenamiento y hagamos una consulta
+      if (cacheFechaAlmacenamiento && cacheDatosAlmacenamiento && !recargarNuevaEntrada.current && !forzarRecargar) {
+        const cacheFecha = parseInt(cacheFechaAlmacenamiento, 10);
 
+        //Realizamos llamada a almacenamiento local si temporalmente el caché es válido
+        if (ahora - cacheFecha < tiempo ) {
+          console.log("[bitácora] Obteniendo entradas del almacenamiento local...");
+          setEntradas(JSON.parse(cacheDatosAlmacenamiento));
+          setIsLoading(false);
+          setError(false);
+          return;
+        }
+      }
+
+      //SIN CACHÉ VÁLIDO -> llamar a base de datos
+      const api = createApi(authToken, refreshToken, setAuthToken);
+      console.log("[bitácora] Obteniendo entradas de la base de datos...");
+      const res = await api.get("/bitacora/" + pacienteID + "/");
+      setEntradas(res.data);
+      setIsLoading(false);
+      setError(false);
+      await AsyncStorage.setItem(datosAlmacenamiento, JSON.stringify(res.data));
+      await AsyncStorage.setItem(fechaAlmacenamiento, ahora.toString());
+      if (recargarNuevaEntrada.current) {
+        recargarNuevaEntrada.current = false;
+      }
+    } catch (err) {
+      console.log("[bitácora] Error:", err);
+      setIsLoading(false);
+      setError(true);
+    }
+  };
+
+  //HANDLE: AGREGAR
   const handleAgregar = () => {
-    console.log('Agregar entrada pulsado')
-    console.log("Paciente:", paciente);
+    console.log("[bitácora] Agregando entrada...")
+    console.log("[bitácora] Paciente:", paciente);
     router.push(`/profesional/${paciente}/bitacora/entrada-agregar`);
   }
 
+  //VISTA
   return (
     <View className="flex-1">
-      <Text className="text-3xl font-bold my-2 align-middle self-center color-primary">Bitácora</Text>
-
-      {/* Solo la lista */}
+      <TituloRecargar onPress={() => fetchEntradas(true)}>
+        Bitácora
+      </TituloRecargar>
       <View className="flex-1">
-        <ListaEntradas entradas={entradas}/>
+        {isLoading ? (
+          <IndicadorCarga/>
+        ) : error ? (
+          <MensajeVacio
+            mensaje={`Hubo un error al cargar las entradas.`}
+            recargar={true}
+            onPress={() => fetchEntradas(true)}
+          />
+        ) : entradas.length === 0 ? (
+          <MensajeVacio
+            mensaje={`Sin entradas por ahora.\n¡Comienza a registrar el progreso del paciente usando el botón ＋!`}/>
+        ) : (
+          <ListaEntradas entradas={entradas} />
+        )}
       </View>
-
-      {/* Botón flotante para agregar */}
-      <TouchableOpacity
-        onPress={handleAgregar}
-        className="absolute bottom-6 right-6 bg-secondary rounded-full w-14 h-14 items-center justify-center shadow-lg"
-      >
-        <Text className="text-white text-xl">＋</Text>
-      </TouchableOpacity>
+      <BotonAgregar onPress={handleAgregar}/>
     </View>
   )
+  
 }
-
-export default Bitacora
