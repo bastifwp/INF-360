@@ -1,8 +1,8 @@
 import React from "react";
 import { View } from "react-native";
 import { Slot, useLocalSearchParams } from "expo-router";
-import { Footer } from "@/components/Footer";
-import { HeaderPaciente } from "@/components/Header";
+import { Footer } from "@/components/layout/Footer";
+import { HeaderPaciente } from "@/components/layout/Header";
 
 export default function LayoutProfesionalPaciente() {
 
@@ -12,8 +12,8 @@ export default function LayoutProfesionalPaciente() {
 
   return (
     <View className="flex-1">
-      <HeaderPaciente nombre={pacienteNombre} />
-      <View className="flex-1 p-4 pb-24">
+      {pacienteNombre && <HeaderPaciente nombre={pacienteNombre}/>}
+      <View className="flex-1 px-4 py-2 pb-24">
         <Slot />
       </View>
       <Footer />

@@ -1,8 +1,8 @@
 import React from "react";
 import { View } from "react-native";
 import { Slot, useLocalSearchParams } from "expo-router";
-import { Footer } from "@/components/Footer";
-import { HeaderPaciente } from "@/components/Header";
+import { Footer } from "@/components/layout/Footer";
+import { HeaderPaciente } from "@/components/layout/Header";
 
 export default function LayoutCuidadorPaciente() {
 

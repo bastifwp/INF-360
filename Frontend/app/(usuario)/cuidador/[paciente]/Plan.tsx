@@ -1,4 +1,4 @@
-import { Plan } from "@/components/plan/Plan";
+import { Plan } from "@/components/vistas/plan/Plan";
 
 export default function PlanCuidador() {
   return (
