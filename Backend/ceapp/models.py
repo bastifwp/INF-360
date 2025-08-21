@@ -26,6 +26,13 @@ class ProfesionalPlanTrabajo(models.Model):
     plan_trabajo = models.ForeignKey(PlanTrabajo, on_delete=models.CASCADE, related_name='profesionales')
 
 
+class Mensaje(models.Model):
+    plan = models.ForeignKey(PlanTrabajo, on_delete=models.CASCADE, related_name="mensajes")
+    autor = models.ForeignKey(User, on_delete=models.CASCADE)
+    contenido = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+
 class Objetivo(models.Model):
     titulo = models.CharField(max_length=255)
     descripcion = models.TextField()

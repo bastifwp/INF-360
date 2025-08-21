@@ -1,12 +1,9 @@
-import SelectorPaciente from "../../components/SelectorPaciente";
-import { useAuth } from "../../context/auth";
+import { SelectorPaciente } from "@/components/SelectorPaciente";
 
 export default function InicioProfesional() {
-
-  const { user } = useAuth();
   
   return (
-    <SelectorPaciente rol="profesional" nombre={user.nombre}/>
+    <SelectorPaciente/>
   );
   
 }
