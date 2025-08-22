@@ -29,7 +29,7 @@ DEBUG = True
 
 
 #TO ALLOW MOBILE ACCES: 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', "192.168.1.115"]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', "192.168.1.164"]
 
 #To only web acces:
 #ALLOWED_HOSTS = []

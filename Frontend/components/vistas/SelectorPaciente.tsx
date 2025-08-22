@@ -78,8 +78,14 @@ export function SelectorPaciente() {
 
   //HANDLE: AGREGAR-PACIENTE
   const handleAgregarPaciente = () => {
-    console.log("[selector-paciente] Agregando paciente...")
-    router.push(`/cuidador/paciente-agregar`);
+    if(isProfesional){
+      console.log("[selector-paciente] Agregando paciente...")
+      router.push(`/profesional/paciente-agregar`);
+    }
+    else{
+      console.log("[selector-paciente] Agregando paciente...")
+      router.push(`/cuidador/paciente-agregar`);
+    }
   }
 
   //FILTRO
@@ -132,7 +138,7 @@ export function SelectorPaciente() {
           </>
         )}
       </View>
-      {isProfesional ? null : <BotonAgregar onPress={handleAgregarPaciente}/>}
+      <BotonAgregar onPress={handleAgregarPaciente}/>
     </View>
   );
 }

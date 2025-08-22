@@ -7,7 +7,7 @@ import { Boton } from "@/components/base/Boton";
 import { Titulo } from "@/components/base/Titulo";
 import { FormularioCampo, FormularioCampoFechaNacimiento } from "@/components/base/Entrada";
 
-export default function PacienteAgregar() {
+export default function PacienteAgregarCuidador() {
   
   const { authToken, refreshToken, createApi, setAuthToken } = useAuth();
 

@@ -45,10 +45,12 @@ export default function Chat() {
       fecha: new Date("2025-08-02T09:20:00"),
     },
   ]);
+
   const [fechaUltimaLectura, setFechaUltimaLectura] = useState(
     new Date("2025-08-01T20:00:00")
   );
-   const [inputHeight, setInputHeight] = useState(40); // altura inicial mínima
+
+  const [inputHeight, setInputHeight] = useState(40); // altura inicial mínima
 
   // Función para formatear fechas a texto
   const formatearFecha = (fecha) => {
@@ -61,38 +63,40 @@ export default function Chat() {
 
   // Construir array con separadores por día y separador "nuevos mensajes"
   const mensajesConSeparadores = useMemo(() => {
-  let resultado = [];
-  let fechaAnterior = null;
-  let separadorNuevosInsertado = false;
+    
+    let resultado = [];
+    let fechaAnterior = null;
+    let separadorNuevosInsertado = false;
 
-  // Ordenar mensajes cronológicamente
-  const mensajesOrdenados = mensajes.slice().sort((a, b) => a.fecha - b.fecha);
+    // Ordenar mensajes cronológicamente
+    const mensajesOrdenados = mensajes.slice().sort((a, b) => a.fecha - b.fecha);
 
-  for (const msg of mensajesOrdenados) {
-    const fechaMsg = getFechaDia(msg.fecha);
-    // Insertar separador de nuevos mensajes solo una vez antes del primer mensaje más reciente que fechaUltimaLectura
-    if (!separadorNuevosInsertado && msg.fecha > fechaUltimaLectura) {
+    for (const msg of mensajesOrdenados) {
+      const fechaMsg = getFechaDia(msg.fecha);
+      // Insertar separador de nuevos mensajes solo una vez antes del primer mensaje más reciente que fechaUltimaLectura
+      if (!separadorNuevosInsertado && msg.fecha > fechaUltimaLectura) {
+        resultado.push({
+          id: "separador-nuevos",
+          tipo: "nuevo-separador",
+        });
+        separadorNuevosInsertado = true;
+      }
+      // Insertar separador de fecha si cambia el día
+      if (fechaMsg !== fechaAnterior) {
+        resultado.push({
+          id: `separador-fecha-${fechaMsg}`,
+          tipo: "separador-fecha",
+          fecha: msg.fecha,
+        });
+        fechaAnterior = fechaMsg;
+      }
       resultado.push({
-        id: "separador-nuevos",
-        tipo: "nuevo-separador",
+        ...msg,
+        tipo: "mensaje",
       });
-      separadorNuevosInsertado = true;
     }
-    // Insertar separador de fecha si cambia el día
-    if (fechaMsg !== fechaAnterior) {
-      resultado.push({
-        id: `separador-fecha-${fechaMsg}`,
-        tipo: "separador-fecha",
-        fecha: msg.fecha,
-      });
-      fechaAnterior = fechaMsg;
-    }
-    resultado.push({
-      ...msg,
-      tipo: "mensaje",
-    });
-  }
-  return resultado;
+    return resultado;
+  
   }, [mensajes, fechaUltimaLectura]);
 
   const enviarMensaje = () => {
