@@ -29,10 +29,10 @@ DEBUG = True
 
 
 #TO ALLOW MOBILE ACCES: 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', "192.168.1.5"]
+#ALLOWED_HOSTS = ['localhost', '127.0.0.1', "<your_ip>"]
 
 #To only web acces:
-#ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'ceapp.CustomUser'
 
@@ -51,7 +51,7 @@ CHANNEL_LAYERS ={
     'default':{
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG':{
-            'hosts' : [("redis", 6379)] #Your ip
+            'hosts' : [("redis", 6379)] 
         }
     }
 }

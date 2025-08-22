@@ -35,6 +35,9 @@ export default function Chat() {
   useEffect(() => {
     if(!plan_id) return //Si la ruta está mala (no tiene plan id)
     const socketUrl = WS_BASE_URL + `/chat/${plan_id}/?token=${authToken}`;
+
+    console.log(socketUrl);
+
     ws.current = new WebSocket(socketUrl);
 
     //----------------------------
