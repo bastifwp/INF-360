@@ -11,7 +11,10 @@ export default {
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
     ios: {
-      supportsTablet: true
+      supportsTablet: true,
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     android: {
       adaptiveIcon: {
@@ -41,7 +44,8 @@ export default {
       typedRoutes: true
     },
     extra: {
-      apiBaseUrl: process.env.API_BASE_URL || "http://localhost:8000"
+      apiBaseUrl: process.env.API_BASE_URL || "http://localhost:8000",
+      wsBaseUrl:  process.env.WS_BASE_URL  || "ws://localhost:8000/ws"
     }
   }
 };

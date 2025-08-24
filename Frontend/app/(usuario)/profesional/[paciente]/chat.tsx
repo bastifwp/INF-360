@@ -1,13 +1,123 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { FlatList, Text, TextInput, TouchableOpacity, View, Alert } from "react-native";
 import { Titulo } from "@/components/base/Titulo";
 import { colors } from "@/constants/colors";
 
+import { useAuth } from "@/context/auth";
+import { usePathname } from "expo-router";
+import Constants from "expo-constants";
+
+const WS_BASE_URL = Constants.expoConfig?.extra?.wsBaseUrl;
+
 export default function Chat() {
+
+  //Obtenemos usuario y token del contexto
+  const {user, authToken} = useAuth();
+  const pathname = usePathname(); 
+
+  //Sacamos el plan_id de la URL
+  const plan_id = pathname.split("/")[2].split("-")[0];
+
 
   //ESTADOS
   const [texto, setTexto] = useState("");
+  const [mensajes, setMensajes] = useState<any[]>([]);
+  const [inputHeight, setInputHeight] = useState(40); // altura inicial mínima
+
+  const ws = useRef<WebSocket | null>(null);
+
+
+  // ------ Nos conectaos al websocket al entrar a la vista
+  useEffect(() => {
+    if(!plan_id) return //Si la ruta está mala (no tiene plan id)
+    const socketUrl = WS_BASE_URL + `/chat/${plan_id}/?token=${authToken}`;
+    ws.current = new WebSocket(socketUrl);
+
+    //----------------------------
+    //  Eventos del web socket
+    //----------------------------
+
+    //Conección con servidor
+    ws.current.onopen = () => {
+      console.log("Web Socket connected");
+    } 
+
+
+    //Recepción de mensajes desde el backend al frontend
+    ws.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("Mensaje recibido:", data);
+    
+
+      setMensajes( (prev) => [
+        ...prev, //Prev son los mensajes que ya existian
+        {
+          id: Date.now(), //Esto lo puso chatgpt nJKNASDJ
+          nombre: data.user,
+          mensaje: data.message,
+          propio: data.user === user?.email,
+          fecha: new Date(),
+          error: false,
+          deleted: false
+        },
+      ]);
+    };
+
+
+    //Error en el web socket
+    ws.current.onerror = (err) => {
+      console.error("Error en WebSocket:", err);
+    };   
+
+    //Fin de conexión con el servidor
+    ws.current.onclose = () => {
+      console.log("🔌 WebSocket cerrado");
+    };
+
+    
+    return () => {
+      ws.current?.close();
+    };
+
+
+  }, [plan_id, authToken]);
+
+
+  // -------- Función pare enviar mensaje ---------------
+  // Estoy pensando que esto quizas haya que cambiarlo un poco para poder hacer esto de intentar re-enviar el mensaje.
+  const enviarMensaje = (text: string) => {
+
+    if (!text.trim() || !ws.current) return; //Si no hay mensaje o si no está la conexión con websocket no podemos enviar.
+   
+    console.log("Sending message");
+
+    //Aqui habria que ponerle alguna condición como que el websocket no está abierto o algo así
+    if(text == "error"){
+      const nuevoMensaje = {
+        id: mensajes.length + 1,
+        nombre: "Tú",
+        mensaje: text,
+        propio: true,
+        fecha: new Date(),
+        error: true,
+        deleted: false
+      };
+      console.log("Message failed")
+      setMensajes([...mensajes, nuevoMensaje]);
+    }
+    else{
+      ws.current.send(JSON.stringify({message: text}));
+      console.log("Message sent");
+      //setMensajes([...mensajes, nuevoMensaje]);
+    }
+     
+    setTexto("");
+  };
+
+
+
+  /*
   const [mensajes, setMensajes] = useState([
     {
       id: 1,
@@ -44,22 +154,20 @@ export default function Chat() {
       propio: false,
       fecha: new Date("2025-08-02T09:20:00"),
     },
-  ]);
-
+  ]);*/
   const [fechaUltimaLectura, setFechaUltimaLectura] = useState(
     new Date("2025-08-01T20:00:00")
   );
-
-  const [inputHeight, setInputHeight] = useState(40); // altura inicial mínima
+   
 
   // Función para formatear fechas a texto
-  const formatearFecha = (fecha) => {
+  const formatearFecha = (fecha: any) => {
     const opciones = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
     return fecha.toLocaleDateString(undefined, opciones);
   };
 
   // Obtener solo fecha sin hora para comparar días
-  const getFechaDia = (fecha) => fecha.toISOString().split("T")[0];
+  const getFechaDia = (fecha: any) => fecha.toISOString().split("T")[0];
 
   // Construir array con separadores por día y separador "nuevos mensajes"
   const mensajesConSeparadores = useMemo(() => {
@@ -99,35 +207,14 @@ export default function Chat() {
   
   }, [mensajes, fechaUltimaLectura]);
 
-  const enviarMensaje = () => {
-    if (!texto.trim()) return;
-    const nuevoMensaje = {
-      id: mensajes.length + 1,
-      nombre: "Tú",
-      mensaje: texto,
-      propio: true,
-      fecha: new Date(),
-      error: false
-    };
-
-    //Aqui intentar mandar el mensaje
-    //Reemplazar este if por el caso en que se devuelva un error al enviar el mensaje
-    if(texto == "error"){
-      nuevoMensaje.error = true
-    }
-
-    setMensajes([...mensajes, nuevoMensaje]);
-    setTexto("");
-    
+  const handleCancelarEnvio = (id) => {
+    console.log("Borrando mensaje");
+    setMensajes((prev) =>
+      prev.map((msg) =>
+        msg.id === id ? { ...msg, deleted: true } : msg
+      )
+    );
   };
-
-  const handleReenvio = () => {
-    console.log("Reenviar mensaje")
-  }
-
-  const handleCancelarEnvio = () => {
-    console.log("Borrando mensaje")
-  }
 
   return (
 
@@ -149,23 +236,25 @@ export default function Chat() {
             
             if (item.tipo === "nuevo-separador") {
               return (
-                <View className="flex-row items-center my-1">
+                <View className="flex-row items-center my-2">
                   <View className="flex-1 h-px bg-secondary" />
                   <View className="bg-secondary rounded-full px-4 py-1 items-center">
-                    <Text className="text-white text-sm">Nuevos mensajes</Text>
+                    <Text className="text-white text-base">Nuevos mensajes</Text>
                   </View>
                   <View className="flex-1 h-px bg-secondary" />
-                </View>
+              </View>
               );
             }
 
             if (item.tipo === "separador-fecha") {
               return (
                 <View className="bg-mediumdarkgrey rounded-full px-4 py-1 my-2 items-center self-center">
-                  <Text className="text-white text-sm">{formatearFecha(item.fecha)}</Text>
+                  <Text className="text-white text-base">{formatearFecha(item.fecha)}</Text>
                 </View>
               );
             }
+
+            if(item.deleted) return ;
 
             // Mensajes normales
             return (
@@ -200,8 +289,8 @@ export default function Chat() {
                           "Mensaje no enviado",
                           "¿Qué quieres hacer con este mensaje?",
                           [
-                            { text: "Reenviar", onPress: handleReenvio },
-                            { text: "Borrar", style: "destructive", onPress: handleCancelarEnvio},
+                            { text: "Reenviar", onPress: () => enviarMensaje(item.mensaje)},
+                            { text: "Borrar", style: "destructive", onPress: () => handleCancelarEnvio(item.id)},
                             { text: "Salir", style: "cancel" },
                           ]
                         );
@@ -246,7 +335,7 @@ export default function Chat() {
 
           <TouchableOpacity
             className="bg-secondary rounded-full p-2 ml-2 justify-center items-center"
-            onPress={enviarMensaje}
+            onPress={() => enviarMensaje(texto)}
           >
             <Ionicons name="send" size={24} color="white" />
           </TouchableOpacity>

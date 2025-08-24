@@ -4,3 +4,7 @@ djangorestframework-simplejwt
 psycopg2-binary
 python-dotenv
 django-cors-headers
+channels
+daphne
+channels-redis 
+django-channels-jwt-auth-middleware

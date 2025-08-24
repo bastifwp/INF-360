@@ -193,6 +193,7 @@ export default function EntradaAgregar() {
       if (!!actividadesSeleccionadas[k] !== !!datosIniciales.current.actividadesSeleccionadas[k]) return true;
     }
     return false;
+
   };
 
   //DESCARTAR CAMBIOS
