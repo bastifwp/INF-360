@@ -6,6 +6,7 @@ from .views.plan_trabajo import PlanTrabajoView, ProfesionalPlanTrabajoView
 from .views.objetivos import ObjetivoView, ObjetivosPorPlanView, ObjetivoDetailView
 from .views.bitacoras import BitacoraEntradaView, BitacoraPorPlanView
 from .views.relaciones import BitacoraEntradaObjetivoView
+from .views.chat import MensajeView, UltimaLecturaView
 
 # Importar vistas para login
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -31,4 +32,10 @@ urlpatterns = [
 
     # Relaciones entre bitácora y objetivos
     path('bitacora-entrada-objetivo/', BitacoraEntradaObjetivoView.as_view(), name='bitacora-entrada-objetivo'),
+
+    #Get de mensajes antiguos de un chat
+    path('chat/<int:plan_id>/mensajes/', MensajeView.as_view(), name="mensajes"),
+
+    #Campo "ultima_lectura" de un chat
+    path("chat/<int:plan_id>/ultima-lectura/", UltimaLecturaView.as_view(), name="ultima-lectura")
 ]

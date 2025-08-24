@@ -24,13 +24,13 @@ class PlanTrabajo(models.Model):
 class ProfesionalPlanTrabajo(models.Model):
     profesional = models.ForeignKey(User, on_delete=models.CASCADE, related_name='planes_profesional')
     plan_trabajo = models.ForeignKey(PlanTrabajo, on_delete=models.CASCADE, related_name='profesionales')
-
+    ultima_lectura = models.DateTimeField(null=True, blank=True)  #Fecha de última lectura del plan
 
 class Mensaje(models.Model):
     plan = models.ForeignKey(PlanTrabajo, on_delete=models.CASCADE, related_name="mensajes")
     autor = models.ForeignKey(User, on_delete=models.CASCADE)
-    contenido = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
+    text = models.TextField()
+    timestamp = models.DateTimeField()
 
 
 class Objetivo(models.Model):

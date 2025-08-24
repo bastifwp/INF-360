@@ -14,6 +14,9 @@ from .relaciones import (
     BitacoraEntradaObjetivoSerializer,
 )
 
+
+from .chat import MensajeSerializer
+
 ObjetivoSerializer = ObjetivoReadSerializer
 ObjetivoPOSTSerializer = ObjetivoWriteSerializer
 
