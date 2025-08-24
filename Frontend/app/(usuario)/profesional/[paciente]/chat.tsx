@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useMemo } from "react";
-import { FlatList, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { FlatList, Text, TextInput, TouchableOpacity, View, Alert } from "react-native";
 import { Titulo } from "@/components/base/Titulo";
 import { colors } from "@/constants/colors";
 
@@ -107,10 +107,27 @@ export default function Chat() {
       mensaje: texto,
       propio: true,
       fecha: new Date(),
+      error: false
     };
+
+    //Aqui intentar mandar el mensaje
+    //Reemplazar este if por el caso en que se devuelva un error al enviar el mensaje
+    if(texto == "error"){
+      nuevoMensaje.error = true
+    }
+
     setMensajes([...mensajes, nuevoMensaje]);
     setTexto("");
+    
   };
+
+  const handleReenvio = () => {
+    console.log("Reenviar mensaje")
+  }
+
+  const handleCancelarEnvio = () => {
+    console.log("Borrando mensaje")
+  }
 
   return (
 
@@ -157,15 +174,50 @@ export default function Chat() {
                 style={{ alignSelf: item.propio ? "flex-end" : "flex-start" }}
               >
                 <Text className="text-black text-base font-semibold">{item.nombre}</Text>
+
                 <View
-                  className="p-2 rounded-lg"
-                  style={{ backgroundColor: item.propio ? colors.lightblue : colors.lightpurple }}
+                  className="p-2 rounded-xl flex-row items-center"
+                  style={{
+                    backgroundColor: item.error
+                      ? colors.lightred
+                      : item.propio
+                      ? colors.lightblue
+                      : colors.lightpurple,
+                  }}
                 >
-                  <Text className="text-black text-base">{item.mensaje}</Text>
+                  <Text
+                    className={`text-base px-1 ${
+                      item.error ? "text-red-600 font-semibold" : "text-black"
+                    }`}
+                  >
+                    {item.mensaje}
+                  </Text>
+
+                  {item.error && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        Alert.alert(
+                          "Mensaje no enviado",
+                          "¿Qué quieres hacer con este mensaje?",
+                          [
+                            { text: "Reenviar", onPress: handleReenvio },
+                            { text: "Borrar", style: "destructive", onPress: handleCancelarEnvio},
+                            { text: "Salir", style: "cancel" },
+                          ]
+                        );
+                      }}
+                    >
+                      <Ionicons name="warning" size={20} color="#dc2626" />
+                    </TouchableOpacity>
+                  )}
                 </View>
-                <Text className="text-black text-xs text-right">{item.fecha.toLocaleTimeString()}</Text>
+
+                <Text className="text-black text-xs text-right">
+                  {item.fecha.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </Text>
               </View>
             );
+
           }}
         />
 

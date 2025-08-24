@@ -26,7 +26,7 @@ const categoriaColores = {
 
 //OBJETIVO GENERAL
 interface ObjetivoGeneral {
-  id: string;
+  id: number;
   titulo: string;
   descripcion: string;
   categoria: string;
