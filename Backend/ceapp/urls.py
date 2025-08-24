@@ -1,43 +1,38 @@
-from django.urls import path
+# ceapp/urls.py
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
-# Importar vista
-from .views.views import (
-    RegisterView,
-    PlanTrabajoView,
-    ObjetivoView,
-    BitacoraEntradaView,
-    ProfesionalPlanTrabajoView,
-    BitacoraEntradaObjetivoView,
-    CustomObtainPairView,
-    ObjetivosPorPlanView,
-    ObjetivoDetailView,
-    BitacoraPorPlanView
-)
+from .views.auth import RegisterView, CustomObtainPairView
+from .views.plan_trabajo import PlanTrabajoView, ProfesionalPlanTrabajoView
+from .views.bitacoras import BitacoraEntradaView, BitacoraPorPlanView
+from .views.relaciones import BitacoraEntradaObjetivoView
 
-#importar vistas para login
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+# --- NUEVOS viewsets para objetivos ---
+from .views.objetivos import ObjetivoGeneralViewSet, ObjetivoEspecificoViewSet
 
+from rest_framework_simplejwt.views import TokenRefreshView
 
-# Agregar path de nueva vista con su ruta
+router = DefaultRouter()
+router.register(r'objetivos-generales', ObjetivoGeneralViewSet, basename='objetivo-general')
+router.register(r'objetivos-especificos', ObjetivoEspecificoViewSet, basename='objetivo-especifico')
+
 urlpatterns = [
-
-    #Registro y login
+    # Registro y login
     path('registro/', RegisterView.as_view(), name='registro'),
-    path('token/', CustomObtainPairView.as_view(), name='obtener_tokens'),  #En teoría este verifica que existe al intenar logearse
-    path('token/refresh/', TokenRefreshView.as_view(), name='reiniciar_token'), 
+    path('token/', CustomObtainPairView.as_view(), name='obtener_tokens'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='reiniciar_token'),
 
+    # Plan de trabajo
     path('plan-trabajo/', PlanTrabajoView.as_view(), name='plan-trabajo'),
-    # path('objetivo/', ObjetivoView.as_view(), name='objetivo'),
-    path('bitacora-entrada/', BitacoraEntradaView.as_view(), name='bitacora-entrada'),
     path('profesional-plan-trabajo/', ProfesionalPlanTrabajoView.as_view(), name='profesional-plan-trabajo'),
+
+    # Bitácoras
+    path('bitacora-entrada/', BitacoraEntradaView.as_view(), name='bitacora-entrada'),
+    path('bitacora/<int:id_plan>/', BitacoraPorPlanView.as_view(), name='bitacora-por-plan'),
+
+    # Relaciones (through de bitácora <-> objetivo específico)
     path('bitacora-entrada-objetivo/', BitacoraEntradaObjetivoView.as_view(), name='bitacora-entrada-objetivo'),
 
-    # Objetivos según plan
-    path('objetivos/<int:id_plan>/', ObjetivosPorPlanView.as_view(), name='objetivos-por-plan'),
-
-    # Objetivo individual (GET, PUT, DELETE)
-    path('objetivos/detalle/<int:id_obj>/', ObjetivoDetailView.as_view(), name='objetivo-detalle'),
-
-    # Bitácora según plan
-    path('bitacora/<int:id_plan>/', BitacoraPorPlanView.as_view(), name='bitacora-por-plan'),
+    # Rutas nuevas de objetivos (CRUD completo)
+    path('', include(router.urls)),
 ]

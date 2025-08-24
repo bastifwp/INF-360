@@ -36,9 +36,31 @@ ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'ceapp.CustomUser'
 
-# Application definition
 
+#Thumbnail uploads (creo que esto no lo usaremos)
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
+ 
+
+# Daphne configuration -> ADDED FOR CHAT 
+ASGI_APPLICATION = 'config.asgi.application'
+
+
+#Channels configuration -> ADDED FOR CHAT
+CHANNEL_LAYERS ={
+    'default':{
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG':{
+            'hosts' : [("redis", 6379)] 
+        }
+    }
+}
+
+
+
+# Application definition
 INSTALLED_APPS = [
+    'daphne', #ADDED FOR CHAT
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -106,8 +128,8 @@ DATABASES = {
         'NAME': os.getenv("POSTGRES_DB", "ceapp"),
         'USER': os.getenv("POSTGRES_USER", "ceapp_user"),
         'PASSWORD': os.getenv("POSTGRES_PASSWORD", "ceapp_pass"),
-        'HOST': 'db',
-        'PORT': '5432',
+        'HOST': os.getenv("DB_HOST", "db"),
+        'PORT': os.getenv("DB_PORT", "5432"),
     }
 }
 
@@ -156,8 +178,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #For comunication with others (no funciona desde celulares):
 '''
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8081",
-    "http://localhost:8000",
+    "http://192.168.1.5:8081",
+    "http://192.168.1.5:8000",
 ]
 '''
 

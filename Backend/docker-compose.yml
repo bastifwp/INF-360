@@ -1,7 +1,7 @@
 services:
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: python -u manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
     ports:
@@ -10,6 +10,10 @@ services:
       - .env
     depends_on:
       - db
+      
+    environment:
+      # Force Python to be unbuffered
+      - PYTHONUNBUFFERED=1
 
   db:
     image: postgres:15
@@ -19,6 +23,11 @@ services:
       POSTGRES_DB: ceapp
       POSTGRES_USER: ceapp_user
       POSTGRES_PASSWORD: ceapp_pass
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
 
 volumes:
   postgres_data:
